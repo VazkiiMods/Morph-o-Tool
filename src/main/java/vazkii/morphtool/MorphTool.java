@@ -16,7 +16,7 @@ public class MorphTool {
 	public static final String BUILD = "GRADLE:BUILD";
 	public static final String VERSION = "GRADLE:VERSION-" + BUILD;	
 	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);";
-	public static final String GUI_FACTORY = "vazkii.neat.GuiFactory";
+	public static final String GUI_FACTORY = "vazkii.morphtool.GuiFactory";
 
 	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
 	public static CommonProxy proxy;

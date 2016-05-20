@@ -1,3 +1,4 @@
 morphtool.sudo_name=Morphing Tool (%s)
+morphtool.hold_shift=(Hold Shift)
 
 item.morphtool:tool.name=Morphing Tool

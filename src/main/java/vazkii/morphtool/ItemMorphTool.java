@@ -1,6 +1,10 @@
 package vazkii.morphtool;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -13,6 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.RecipeSorter;
+import net.minecraftforge.oredict.RecipeSorter.Category;
 
 public class ItemMorphTool extends Item {
 
@@ -22,6 +28,9 @@ public class ItemMorphTool extends Item {
 		
 		setUnlocalizedName("morphtool:tool");
 		GameRegistry.register(this, new ResourceLocation("morphtool:tool"));
+		
+		GameRegistry.addRecipe(new AttachementRecipe());
+		RecipeSorter.register("morphtool:attachment", AttachementRecipe.class, Category.SHAPELESS, "");
 	}
 	
 	@Override
@@ -29,23 +38,33 @@ public class ItemMorphTool extends Item {
 		Block block = worldIn.getBlockState(pos).getBlock();
 		boolean rotated = block.rotateBlock(worldIn, pos, facing);
 		
-		// TODO DEBUG
-		NBTTagCompound cmp = new NBTTagCompound();
-		cmp.setBoolean(MorphingHandler.TAG_MORPHING_TOOL, true);
-		NBTTagCompound dataCmp = new NBTTagCompound();
-		
-		NBTTagCompound psiCmp = new NBTTagCompound();
-		playerIn.inventory.getStackInSlot(1).writeToNBT(psiCmp);
-		dataCmp.setTag("psi", psiCmp);
-		
-		NBTTagCompound quarkCmp = new NBTTagCompound();
-		playerIn.inventory.getStackInSlot(2).writeToNBT(quarkCmp);
-		dataCmp.setTag("quark", quarkCmp);
-		
-		cmp.setTag(MorphingHandler.TAG_MORPH_TOOL_DATA, dataCmp);
-		stack.setTagCompound(cmp);
-		
 		return rotated ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
+	}
+	
+	@Override
+	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+		if(!stack.hasTagCompound() || !stack.getTagCompound().hasKey(MorphingHandler.TAG_MORPH_TOOL_DATA))
+			return;
+		
+		NBTTagCompound data = stack.getTagCompound().getCompoundTag(MorphingHandler.TAG_MORPH_TOOL_DATA);
+		if(data.getKeySet().size() == 0)
+			return;
+		
+		if(!GuiScreen.isShiftKeyDown())
+			tooltip.add(I18n.format("morphtool.hold_shift"));
+		else for(String s : data.getKeySet()) {
+				NBTTagCompound cmp = data.getCompoundTag(s);
+				if(cmp != null) {
+					ItemStack modStack = ItemStack.loadItemStackFromNBT(cmp);
+					if(modStack != null) {
+						String name = modStack.getDisplayName();
+						if(modStack.hasTagCompound() && modStack.getTagCompound().hasKey(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
+							name = modStack.getTagCompound().getString(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME);
+						
+						tooltip.add(" " + s + " : " + name);
+					}
+				}
+			}
 	}
 	
 }

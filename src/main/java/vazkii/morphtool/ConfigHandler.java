@@ -35,7 +35,7 @@ public class ConfigHandler {
 		
 		whitelistedItems = loadPropStringList("Whitelisted Items", "botania:twigWand", "appliedenergistics2:ToolNetworkTool");
 		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator");
-		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct");
+		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
 
 		aliases.clear();
 		List<String> aliasesList = loadPropStringList("Mod Aliases", "shadowfox_botany=botania", "ThermalDynamics=ThermalExpansion");

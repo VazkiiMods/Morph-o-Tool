@@ -79,7 +79,9 @@ public final class MorphingHandler {
 		currentCmp = (NBTTagCompound) currentCmp.copy();
 		if(currentCmp.hasKey("tag"))
 			currentCmp.getCompoundTag("tag").removeTag(TAG_MORPH_TOOL_DATA);
-		morphData.setTag(currentMod, currentCmp);
+		
+		if(!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID))
+			morphData.setTag(currentMod, currentCmp);
 		
 		ItemStack stack;
 		if(targetMod.equals(MINECRAFT))
@@ -109,6 +111,7 @@ public final class MorphingHandler {
 			stack.setStackDisplayName(TextFormatting.RESET + I18n.format("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET));
 		}
 		
+		stack.stackSize = 1;
 		return stack;
 	}
 	
