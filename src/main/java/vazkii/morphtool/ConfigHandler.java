@@ -38,7 +38,7 @@ public class ConfigHandler {
 		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
 
 		aliases.clear();
-		List<String> aliasesList = loadPropStringList("Mod Aliases", "shadowfox_botany=botania", "ThermalDynamics=ThermalExpansion");
+		List<String> aliasesList = loadPropStringList("Mod Aliases", "shadowfox_botany=botania", "ThermalDynamics=ThermalExpansion", "rftoolsdim=rftools");
 		for(String s : aliasesList)
 			if(s.matches(".+?=.+")) {
 				String[] tokens = s.toLowerCase().split("=");
