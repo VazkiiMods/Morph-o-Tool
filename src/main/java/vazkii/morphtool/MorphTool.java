@@ -8,7 +8,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import vazkii.morphtool.proxy.CommonProxy;
 
-@Mod(modid = MorphTool.MOD_ID, name = MorphTool.MOD_NAME, version = MorphTool.VERSION, dependencies = MorphTool.DEPENDENCIES)
+@Mod(modid = MorphTool.MOD_ID, name = MorphTool.MOD_NAME, version = MorphTool.VERSION, dependencies = MorphTool.DEPENDENCIES, guiFactory = MorphTool.GUI_FACTORY)
 public class MorphTool {
 
 	public static final String MOD_ID = "Morphtool";
@@ -16,7 +16,8 @@ public class MorphTool {
 	public static final String BUILD = "GRADLE:BUILD";
 	public static final String VERSION = "GRADLE:VERSION-" + BUILD;	
 	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);";
-	
+	public static final String GUI_FACTORY = "vazkii.neat.GuiFactory";
+
 	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
 	public static CommonProxy proxy;
 	
@@ -24,6 +25,8 @@ public class MorphTool {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		ConfigHandler.init(event.getSuggestedConfigurationFile());
+		
 		tool = new ItemMorphTool();
 		
 		proxy.initModels();

@@ -6,4 +6,8 @@ public class CommonProxy {
 		// NO-OP
 	}
 	
+	public void updateEquippedItem() {
+		// NO-OP
+	}
+	
 }
