@@ -30,7 +30,7 @@ public class GuiFactory implements IModGuiFactory {
 	public RuntimeOptionGuiHandler getHandlerFor(RuntimeOptionCategoryElement element) {
 		return null;
 	}
-	
+
 	public static class ConfigGui extends GuiConfig {
 
 		public ConfigGui(GuiScreen parentScreen) {

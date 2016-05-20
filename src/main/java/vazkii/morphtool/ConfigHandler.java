@@ -13,14 +13,14 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class ConfigHandler {
-	
+
 	public static Configuration config;
 
 	public static boolean allItems;
 	public static List<String> whitelistedItems, whitelistedNames, blacklistedMods;
-	
+
 	public static Map<String, String> aliases = new HashMap();
-	
+
 	public static void init(File configFile) {
 		config = new Configuration(configFile);
 
@@ -32,7 +32,7 @@ public class ConfigHandler {
 
 	public static void load() {
 		allItems = loadPropBool("Allow all items to be added", false);
-		
+
 		whitelistedItems = loadPropStringList("Whitelisted Items", "botania:twigWand", "appliedenergistics2:ToolNetworkTool");
 		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator");
 		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
@@ -44,7 +44,7 @@ public class ConfigHandler {
 				String[] tokens = s.toLowerCase().split("=");
 				aliases.put(tokens[0], tokens[1]);
 			}
-		
+
 		if(config.hasChanged())
 			config.save();
 	}
@@ -53,7 +53,7 @@ public class ConfigHandler {
 		Property prop = config.get(Configuration.CATEGORY_GENERAL, propName, default_);
 		return Arrays.asList(prop.getStringList());
 	}
-	
+
 	public static boolean loadPropBool(String propName, boolean default_) {
 		Property prop = config.get(Configuration.CATEGORY_GENERAL, propName, default_);
 		return prop.getBoolean(default_);

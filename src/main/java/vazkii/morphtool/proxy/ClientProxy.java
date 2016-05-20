@@ -10,12 +10,12 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void initModels() {
-        ModelLoader.setCustomModelResourceLocation(MorphTool.tool, 0, new ModelResourceLocation(MorphTool.tool.getRegistryName(), "inventory"));
+		ModelLoader.setCustomModelResourceLocation(MorphTool.tool, 0, new ModelResourceLocation(MorphTool.tool.getRegistryName(), "inventory"));
 	}
-	
+
 	@Override
 	public void updateEquippedItem() {
 		Minecraft.getMinecraft().entityRenderer.itemRenderer.resetEquippedProgress(EnumHand.MAIN_HAND);
 	}
-	
+
 }
