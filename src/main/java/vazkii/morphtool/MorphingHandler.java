@@ -5,6 +5,7 @@ import com.typesafe.config.Config;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -12,6 +13,7 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -44,6 +46,45 @@ public final class MorphingHandler {
 					}
 				}
 			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void onItemDropped(ItemTossEvent event) {
+		if(!event.getPlayer().isSneaking())
+			return;
+		
+		EntityItem e = event.getEntityItem();
+		ItemStack stack = e.getEntityItem(); 
+		if(stack != null && isMorphTool(stack) && stack.getItem() != MorphTool.tool) {
+			NBTTagCompound morphData = (NBTTagCompound) stack.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA).copy();
+			
+			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
+			NBTTagCompound newMorphData = morph.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA);
+			newMorphData.removeTag(getModFromStack(stack));
+
+			if(!e.worldObj.isRemote) {
+				EntityItem newItem = new EntityItem(e.worldObj, e.posX, e.posY, e.posZ, morph);
+				e.worldObj.spawnEntityInWorld(newItem);
+			}
+
+			ItemStack copy = stack.copy();
+			NBTTagCompound copyCmp = copy.getTagCompound();
+			if(copyCmp == null) {
+				copyCmp = new NBTTagCompound();
+				copy.setTagCompound(copyCmp);
+			}
+			
+			copyCmp.removeTag("display");
+			String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
+			if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName()))
+				copy.setStackDisplayName(displayName);
+			
+			copyCmp.removeTag(TAG_MORPHING_TOOL);
+			copyCmp.removeTag(TAG_MORPH_TOOL_DISPLAY_NAME);
+			copyCmp.removeTag(TAG_MORPH_TOOL_DATA);
+
+			e.setEntityItemStack(copy);
 		}
 	}
 	
