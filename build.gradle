@@ -17,15 +17,12 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
 ext.configFile = file('build.properties')
 
 ext.config = parseConfig(configFile)
 
 version = "${config.version}-${config.build_number}"
-group = "vazkii.quark" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+group = "vazkii.morphtool" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_name
 
 minecraft {
