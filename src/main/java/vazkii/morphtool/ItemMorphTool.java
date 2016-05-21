@@ -24,7 +24,7 @@ public class ItemMorphTool extends Item {
 
 	public ItemMorphTool() {
 		setMaxStackSize(1);
-		setCreativeTab(CreativeTabs.MISC);
+		setCreativeTab(CreativeTabs.TOOLS);
 
 		setUnlocalizedName("morphtool:tool");
 		GameRegistry.register(this, new ResourceLocation("morphtool:tool"));
