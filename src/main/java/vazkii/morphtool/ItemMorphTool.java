@@ -61,7 +61,7 @@ public class ItemMorphTool extends Item {
 					if(modStack.hasTagCompound() && modStack.getTagCompound().hasKey(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
 						name = modStack.getTagCompound().getString(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME);
 
-					tooltip.add(" " + s + " : " + name);
+					tooltip.add(" " + MorphingHandler.getModNameForId(s) + " : " + name);
 				}
 			}
 		}

@@ -13,7 +13,13 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public final class MorphingHandler {
 
@@ -152,6 +158,18 @@ public final class MorphingHandler {
 
 		stack.stackSize = 1;
 		return stack;
+	}
+
+	private static final Map<String, String> modNames = new HashMap<String, String>();
+
+	static {
+		for(Map.Entry<String, ModContainer> modEntry : Loader.instance().getIndexedModList().entrySet())
+			modNames.put(modEntry.getKey().toLowerCase(Locale.ENGLISH),  modEntry.getValue().getName());
+	}
+
+	public static String getModNameForId(String modId) {
+		modId = modId.toLowerCase(Locale.ENGLISH);
+		return modNames.containsKey(modId) ? modNames.get(modId) : modId;
 	}
 
 	public static boolean isMorphTool(ItemStack stack) {
