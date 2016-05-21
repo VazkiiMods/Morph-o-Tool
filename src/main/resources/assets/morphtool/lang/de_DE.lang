@@ -1,0 +1,4 @@
+morphtool.sudo_name=Wandelwerkzeug (%s)
+morphtool.hold_shift=(Halte Shift)
+
+item.morphtool:tool.name=Wandelwerkzeug
