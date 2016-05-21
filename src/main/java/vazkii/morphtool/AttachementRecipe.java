@@ -71,7 +71,7 @@ public class AttachementRecipe implements IRecipe {
 	}
 
 	public boolean isTarget(ItemStack stack) {
-		if(stack == null || MorphingHandler.isMorphTool(stack))
+		if(stack == null || MorphingHandler.isMorphTool(stack) || stack.getItem().hasContainerItem(stack))
 			return false;
 
 		String mod = MorphingHandler.getModFromStack(stack);
