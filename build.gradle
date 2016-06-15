@@ -40,11 +40,6 @@ minecraft {
 jar {
     exclude "**/*.bat"
     exclude "**/*.psd"
-
-    manifest {
-        attributes("FMLCorePluginContainsFMLMod": "true", "FMLCorePlugin": "vazkii.quark.base.asm.LoadingPlugin")
-    }
-
 }
 
 processResources {
