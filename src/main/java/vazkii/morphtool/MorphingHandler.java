@@ -1,7 +1,10 @@
 package vazkii.morphtool;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -10,16 +13,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 
 public final class MorphingHandler {
 
@@ -153,7 +153,7 @@ public final class MorphingHandler {
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.setString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			stack.setStackDisplayName(TextFormatting.RESET + I18n.format("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET));
+			stack.setStackDisplayName(TextFormatting.RESET + I18n.translateToLocalFormatted("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET));
 		}
 
 		stack.stackSize = 1;

@@ -88,9 +88,9 @@ public class AttachementRecipe implements IRecipe {
 		if(ConfigHandler.whitelistedItems.contains(registryName.toString()))
 			return true;
 
-		String itemName = registryName.getResourcePath();
+		String itemName = registryName.getResourcePath().toLowerCase();
 		for(String s : ConfigHandler.whitelistedNames)
-			if(itemName.contains(s))
+			if(itemName.contains(s.toLowerCase()))
 				return true;
 
 		return false;
