@@ -10,6 +10,7 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
@@ -35,7 +36,7 @@ public final class MorphingHandler {
 	public void onPlayerTick(LivingUpdateEvent event) {
 		if(event.getEntity() instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) event.getEntity();
-			ItemStack mainHandItem = player.getHeldItemMainhand();
+			ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
 
 			if(isMorphTool(mainHandItem)) {
 				RayTraceResult res = raycast(player, 4.5);
@@ -45,7 +46,7 @@ public final class MorphingHandler {
 
 					ItemStack newStack = getShiftStackForMod(mainHandItem, mod);
 					if(newStack != mainHandItem && !ItemStack.areItemsEqual(newStack, mainHandItem)) {
-						player.inventory.setInventorySlotContents(player.inventory.currentItem, newStack);
+						player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift ? player.inventory.getSizeInventory() - 1 : player.inventory.currentItem, newStack);
 						MorphTool.proxy.updateEquippedItem();
 					}
 				}

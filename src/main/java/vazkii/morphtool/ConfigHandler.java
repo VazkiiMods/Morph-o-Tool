@@ -17,6 +17,7 @@ public class ConfigHandler {
 	public static Configuration config;
 
 	public static boolean allItems;
+	public static boolean invertHandShift;
 	public static List<String> whitelistedItems, whitelistedNames, blacklistedMods;
 
 	public static Map<String, String> aliases = new HashMap();
@@ -32,7 +33,8 @@ public class ConfigHandler {
 
 	public static void load() {
 		allItems = loadPropBool("Allow all items to be added", false);
-
+		invertHandShift = loadPropBool("Morph in the offhand instead of mainhand", false);
+		
 		whitelistedItems = loadPropStringList("Whitelisted Items", "botania:twigWand", "appliedenergistics2:ToolNetworkTool");
 		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator");
 		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
