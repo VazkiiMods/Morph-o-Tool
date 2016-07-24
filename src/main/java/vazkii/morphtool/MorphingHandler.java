@@ -8,6 +8,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.RayTraceResult;
@@ -35,23 +36,43 @@ public final class MorphingHandler {
 	public void onPlayerTick(LivingUpdateEvent event) {
 		if(event.getEntity() instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) event.getEntity();
-			ItemStack mainHandItem = player.getHeldItemMainhand();
+			
+			if(!ConfigHandler.offHand){
+				ItemStack handItem = player.getHeldItemMainhand();
+				if(isMorphTool(handItem)) {
+					RayTraceResult res = raycast(player, 4.5);
+					if(res != null) {
+						IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
+						String mod = getModFromState(state);
 
-			if(isMorphTool(mainHandItem)) {
-				RayTraceResult res = raycast(player, 4.5);
-				if(res != null) {
-					IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
-					String mod = getModFromState(state);
-
-					ItemStack newStack = getShiftStackForMod(mainHandItem, mod);
-					if(newStack != mainHandItem && !ItemStack.areItemsEqual(newStack, mainHandItem)) {
-						player.inventory.setInventorySlotContents(player.inventory.currentItem, newStack);
-						MorphTool.proxy.updateEquippedItem();
+						ItemStack newStack = getShiftStackForMod(handItem, mod);
+						if(newStack != handItem && !ItemStack.areItemsEqual(newStack, handItem)) {
+							player.inventory.setInventorySlotContents(player.inventory.currentItem, newStack);
+							MorphTool.proxy.updateEquippedItem();
+						}
 					}
 				}
 			}
-		}
-	}
+			
+			if(ConfigHandler.offHand){
+				ItemStack handItem = player.getHeldItemOffhand();
+				if(isMorphTool(handItem)) {
+					RayTraceResult res = raycast(player, 4.5);
+					if(res != null) {
+						IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
+						String mod = getModFromState(state);
+
+						ItemStack newStack = getShiftStackForMod(handItem, mod);
+						if(newStack != handItem && !ItemStack.areItemsEqual(newStack, handItem)) {
+							player.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newStack);						
+							MorphTool.proxy.updateEquippedItem();
+					    }
+						}
+					}
+				}
+			}
+			
+			}
 
 	@SubscribeEvent
 	public void onItemDropped(ItemTossEvent event) {

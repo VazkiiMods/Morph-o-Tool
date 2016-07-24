@@ -16,7 +16,7 @@ public class ConfigHandler {
 
 	public static Configuration config;
 
-	public static boolean allItems;
+	public static boolean allItems, offHand;
 	public static List<String> whitelistedItems, whitelistedNames, blacklistedMods;
 
 	public static Map<String, String> aliases = new HashMap();
@@ -36,6 +36,8 @@ public class ConfigHandler {
 		whitelistedItems = loadPropStringList("Whitelisted Items", "botania:twigWand", "appliedenergistics2:ToolNetworkTool");
 		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator");
 		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
+		
+		offHand = loadPropBool("Only morphs in offhand", false);
 
 		aliases.clear();
 		List<String> aliasesList = loadPropStringList("Mod Aliases", "botanicaladdons=botania", "ThermalDynamics=ThermalExpansion", "rftoolsdim=rftools");
