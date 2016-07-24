@@ -37,8 +37,7 @@ public final class MorphingHandler {
 		if(event.getEntity() instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) event.getEntity();
 			
-			if(!ConfigHandler.offHand){
-				ItemStack handItem = player.getHeldItemMainhand();
+				ItemStack handItem = ConfigHandler.offHand ? player.getHeldItemOffhand() : player.getHeldItemMainhand();
 				if(isMorphTool(handItem)) {
 					RayTraceResult res = raycast(player, 4.5);
 					if(res != null) {
@@ -47,32 +46,15 @@ public final class MorphingHandler {
 
 						ItemStack newStack = getShiftStackForMod(handItem, mod);
 						if(newStack != handItem && !ItemStack.areItemsEqual(newStack, handItem)) {
-							player.inventory.setInventorySlotContents(player.inventory.currentItem, newStack);
+							player.setItemStackToSlot(ConfigHandler.offHand ? EntityEquipmentSlot.OFFHAND : EntityEquipmentSlot.MAINHAND, newStack);
 							MorphTool.proxy.updateEquippedItem();
 						}
 					}
 				}
-			}
+			}			
+		}
 			
-			if(ConfigHandler.offHand){
-				ItemStack handItem = player.getHeldItemOffhand();
-				if(isMorphTool(handItem)) {
-					RayTraceResult res = raycast(player, 4.5);
-					if(res != null) {
-						IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
-						String mod = getModFromState(state);
-
-						ItemStack newStack = getShiftStackForMod(handItem, mod);
-						if(newStack != handItem && !ItemStack.areItemsEqual(newStack, handItem)) {
-							player.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newStack);						
-							MorphTool.proxy.updateEquippedItem();
-					    }
-						}
-					}
-				}
-			}
 			
-			}
 
 	@SubscribeEvent
 	public void onItemDropped(ItemTossEvent event) {
