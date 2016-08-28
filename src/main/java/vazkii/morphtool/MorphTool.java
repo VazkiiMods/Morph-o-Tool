@@ -19,7 +19,7 @@ public class MorphTool {
 	public static final String MOD_NAME = "Morph-o-Tool";
 	public static final String BUILD = "GRADLE:BUILD";
 	public static final String VERSION = "GRADLE:VERSION-" + BUILD;
-	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);";
+	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);required-after:AutoRegLib";
 	public static final String GUI_FACTORY = "vazkii.morphtool.GuiFactory";
 
 	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
@@ -39,8 +39,6 @@ public class MorphTool {
 				'B', new ItemStack(Items.DYE, 1, EnumDyeColor.BLUE.getDyeDamage()),
 				'R', new ItemStack(Items.DYE, 1, EnumDyeColor.RED.getDyeDamage()),
 				'I', new ItemStack(Items.IRON_INGOT));
-
-		proxy.initModels();
 
 		MinecraftForge.EVENT_BUS.register(MorphingHandler.INSTANCE);
 	}
