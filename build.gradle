@@ -17,6 +17,9 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
 ext.configFile = file('build.properties')
 
 ext.config = parseConfig(configFile)
