@@ -19,7 +19,7 @@ public class MorphTool {
 	public static final String MOD_NAME = "Morph-o-Tool";
 	public static final String BUILD = "GRADLE:BUILD";
 	public static final String VERSION = "GRADLE:VERSION-" + BUILD;
-	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);required-after:AutoRegLib";
+	public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1909,);required-before:AutoRegLib";
 	public static final String GUI_FACTORY = "vazkii.morphtool.GuiFactory";
 
 	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
