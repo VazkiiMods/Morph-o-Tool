@@ -61,7 +61,7 @@ public final class MorphingHandler {
 
 		EntityItem e = event.getEntityItem();
 		ItemStack stack = e.getEntityItem();
-		if(stack != null && isMorphTool(stack) && stack.getItem() != MorphTool.tool) {
+		if(stack != null && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			NBTTagCompound morphData = (NBTTagCompound) stack.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
@@ -131,14 +131,14 @@ public final class MorphingHandler {
 
 		ItemStack stack;
 		if(targetMod.equals(MINECRAFT))
-			stack = new ItemStack(MorphTool.tool);
+			stack = new ItemStack(ModItems.tool);
 		else {
 			NBTTagCompound targetCmp = morphData.getCompoundTag(targetMod);
 			morphData.removeTag(targetMod);
 
 			stack = ItemStack.loadItemStackFromNBT(targetCmp);
 			if(stack == null)
-				stack = new ItemStack(MorphTool.tool);
+				stack = new ItemStack(ModItems.tool);
 		}
 
 		if(!stack.hasTagCompound())
@@ -148,7 +148,7 @@ public final class MorphingHandler {
 		stackCmp.setTag(TAG_MORPH_TOOL_DATA, morphData);
 		stackCmp.setBoolean(TAG_MORPHING_TOOL, true);
 
-		if(stack.getItem() != MorphTool.tool) {
+		if(stack.getItem() != ModItems.tool) {
 			String displayName = stack.getDisplayName();
 			if(stackCmp.hasKey(TAG_MORPH_TOOL_DISPLAY_NAME))
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -177,7 +177,7 @@ public final class MorphingHandler {
 		if(stack == null)
 			return false;
 
-		if(stack.getItem() == MorphTool.tool)
+		if(stack.getItem() == ModItems.tool)
 			return true;
 
 		return stack.hasTagCompound() && stack.getTagCompound().getBoolean(TAG_MORPHING_TOOL);

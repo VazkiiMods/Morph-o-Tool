@@ -25,8 +25,6 @@ public class MorphTool {
 	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
 	public static CommonProxy proxy;
 
-	public static Item tool;
-
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		ConfigHandler.init(event.getSuggestedConfigurationFile());

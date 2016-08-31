@@ -22,7 +22,7 @@ public class AttachementRecipe implements IRecipe {
 					if(foundTarget)
 						return false;
 					foundTarget = true;
-				} else if(stack.getItem() == MorphTool.tool) {
+				} else if(stack.getItem() == ModItems.tool) {
 					if(foundTool)
 						return false;
 					foundTool = true;
@@ -41,7 +41,7 @@ public class AttachementRecipe implements IRecipe {
 		for(int i = 0; i < var1.getSizeInventory(); i++) {
 			ItemStack stack = var1.getStackInSlot(i);
 			if(stack != null) {
-				if(stack.getItem() == MorphTool.tool)
+				if(stack.getItem() == ModItems.tool)
 					tool = stack;
 				else target = stack;
 			}

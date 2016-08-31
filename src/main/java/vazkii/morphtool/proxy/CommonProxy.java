@@ -12,9 +12,9 @@ import vazkii.morphtool.MorphingHandler;
 public class CommonProxy {
 
 	public void preInit() {
-		MorphTool.tool = new ItemMorphTool();
-
-		GameRegistry.addShapedRecipe(new ItemStack(MorphTool.tool),
+		ModItems.init();
+		
+		GameRegistry.addShapedRecipe(new ItemStack(ModItems.tool),
 				" GB", " IR", "I  ",
 				'G', new ItemStack(Items.DYE, 1, EnumDyeColor.GREEN.getDyeDamage()),
 				'B', new ItemStack(Items.DYE, 1, EnumDyeColor.BLUE.getDyeDamage()),
