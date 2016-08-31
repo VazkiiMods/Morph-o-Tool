@@ -31,16 +31,7 @@ public class MorphTool {
 	public void preInit(FMLPreInitializationEvent event) {
 		ConfigHandler.init(event.getSuggestedConfigurationFile());
 
-		tool = new ItemMorphTool();
-
-		GameRegistry.addShapedRecipe(new ItemStack(tool),
-				" GB", " IR", "I  ",
-				'G', new ItemStack(Items.DYE, 1, EnumDyeColor.GREEN.getDyeDamage()),
-				'B', new ItemStack(Items.DYE, 1, EnumDyeColor.BLUE.getDyeDamage()),
-				'R', new ItemStack(Items.DYE, 1, EnumDyeColor.RED.getDyeDamage()),
-				'I', new ItemStack(Items.IRON_INGOT));
-
-		MinecraftForge.EVENT_BUS.register(MorphingHandler.INSTANCE);
+		proxy.preInit();
 	}
 
 }
