@@ -5,8 +5,7 @@ import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import vazkii.morphtool.ItemMorphTool;
-import vazkii.morphtool.MorphTool;
+import vazkii.morphtool.ModItems;
 import vazkii.morphtool.MorphingHandler;
 
 public class CommonProxy {
