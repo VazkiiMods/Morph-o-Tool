@@ -1,13 +1,18 @@
 package vazkii.morphtool.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.util.EnumHand;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.MinecraftForge;
+import vazkii.morphtool.ClientHandler;
 import vazkii.morphtool.ConfigHandler;
-import vazkii.morphtool.MorphTool;
 
 public class ClientProxy extends CommonProxy {
+
+	@Override
+	public void preInit() {
+		super.preInit();
+		MinecraftForge.EVENT_BUS.register(ClientHandler.INSTANCE);
+	}
 
 	@Override
 	public void updateEquippedItem() {
