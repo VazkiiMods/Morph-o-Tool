@@ -3,8 +3,6 @@ package vazkii.morphtool;
 import java.util.List;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -12,7 +10,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -32,7 +29,7 @@ public class ItemMorphTool extends ItemMod {
 	}
 
 	@Override
-	public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+	public EnumActionResult onItemUse(EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		Block block = worldIn.getBlockState(pos).getBlock();
 		boolean rotated = block.rotateBlock(worldIn, pos, facing);
 
@@ -52,8 +49,8 @@ public class ItemMorphTool extends ItemMod {
 			for(String s : data.getKeySet()) {
 				NBTTagCompound cmp = data.getCompoundTag(s);
 				if(cmp != null) {
-					ItemStack modStack = ItemStack.loadItemStackFromNBT(cmp);
-					if(modStack != null) {
+					ItemStack modStack = new ItemStack(cmp);
+					if(!stack.isEmpty()) {
 						String name = modStack.getDisplayName();
 						if(modStack.hasTagCompound() && modStack.getTagCompound().hasKey(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
 							name = modStack.getTagCompound().getString(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME);

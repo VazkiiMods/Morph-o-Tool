@@ -43,7 +43,7 @@ public final class MorphingHandler {
 			if(isMorphTool(mainHandItem)) {
 				RayTraceResult res = raycast(player, 4.5);
 				if(res != null) {
-					IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
+					IBlockState state = player.getEntityWorld().getBlockState(res.getBlockPos());
 					String mod = getModFromState(state);
 
 					ItemStack newStack = getShiftStackForMod(mainHandItem, mod);
@@ -72,7 +72,7 @@ public final class MorphingHandler {
 	}
 	
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if(stack != null && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
+		if(!stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			NBTTagCompound morphData = (NBTTagCompound) stack.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
@@ -80,9 +80,9 @@ public final class MorphingHandler {
 			newMorphData.removeTag(getModFromStack(stack));
 
 			if(!itemBroken) {
-				if(!e.worldObj.isRemote) {
-					EntityItem newItem = new EntityItem(e.worldObj, e.posX, e.posY, e.posZ, morph);
-					e.worldObj.spawnEntityInWorld(newItem);
+				if(!e.getEntityWorld().isRemote) {
+					EntityItem newItem = new EntityItem(e.getEntityWorld(), e.posX, e.posY, e.posZ, morph);
+					e.getEntityWorld().spawnEntity(newItem);
 				}
 
 				ItemStack copy = stack.copy();
@@ -111,7 +111,7 @@ public final class MorphingHandler {
 	}
 
 	public static String getModFromStack(ItemStack stack) {
-		return getModOrAlias(stack == null ? MINECRAFT : stack.getItem().getRegistryName().getResourceDomain());
+		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getRegistryName().getResourceDomain());
 	}
 
 	public static String getModOrAlias(String mod) {
@@ -149,8 +149,8 @@ public final class MorphingHandler {
 			NBTTagCompound targetCmp = morphData.getCompoundTag(targetMod);
 			morphData.removeTag(targetMod);
 
-			stack = ItemStack.loadItemStackFromNBT(targetCmp);
-			if(stack == null)
+			stack = new ItemStack(targetCmp);
+			if(stack.isEmpty())
 				stack = new ItemStack(ModItems.tool);
 		}
 
@@ -170,7 +170,7 @@ public final class MorphingHandler {
 			stack.setStackDisplayName(TextFormatting.RESET + I18n.translateToLocalFormatted("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET));
 		}
 
-		stack.stackSize = 1;
+		stack.setCount(1);
 		return stack;
 	}
 
@@ -187,7 +187,7 @@ public final class MorphingHandler {
 	}
 
 	public static boolean isMorphTool(ItemStack stack) {
-		if(stack == null)
+		if(stack.isEmpty())
 			return false;
 
 		if(stack.getItem() == ModItems.tool)
@@ -205,7 +205,7 @@ public final class MorphingHandler {
 		if(look == null)
 			return null;
 
-		return raycast(e.worldObj, vec, look, len);
+		return raycast(e.getEntityWorld(), vec, look, len);
 	}
 
 	public static RayTraceResult raycast(World world, Vec3d origin, Vec3d ray, double len) {

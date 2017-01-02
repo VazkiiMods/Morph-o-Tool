@@ -1,6 +1,6 @@
 [
 {
-  "modid": "Morphtool",
+  "modid": "morphtool",
   "name": "Morph-o-Tool",
   "description": "The wrench to end all wrenches.",
   "version": "${version}",
