@@ -26,7 +26,7 @@ public class ClientHandler {
 
     @SubscribeEvent
     public void onMouseEvent(MouseEvent event) {
-        EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;
+        EntityPlayerSP player = Minecraft.getMinecraft().player;
         ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
         if(MorphingHandler.isMorphTool(mainHandItem)) {
             ItemStack newStack = mainHandItem;
@@ -36,7 +36,7 @@ public class ClientHandler {
 
             //Get looked at Mod
             if (res != null) {
-                IBlockState state = player.worldObj.getBlockState(res.getBlockPos());
+                IBlockState state = player.world.getBlockState(res.getBlockPos());
                 modlook = MorphingHandler.getModFromState(state);
                 //Morph tool to looked at Mod
                 if(autoMode && event.getDwheel() == 0){

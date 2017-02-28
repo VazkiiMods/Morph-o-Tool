@@ -4,6 +4,7 @@ import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -16,7 +17,7 @@ public class AttachementRecipe implements IRecipe {
 
 		for(int i = 0; i < var1.getSizeInventory(); i++) {
 			ItemStack stack = var1.getStackInSlot(i);
-			if(stack != null) {
+			if(!stack.isEmpty()) {
 				if(isTarget(stack)) {
 					if(foundTarget)
 						return false;
@@ -34,12 +35,12 @@ public class AttachementRecipe implements IRecipe {
 
 	@Override
 	public ItemStack getCraftingResult(InventoryCrafting var1) {
-		ItemStack tool = null;
-		ItemStack target = null;
+		ItemStack tool = ItemStack.EMPTY;
+		ItemStack target = ItemStack.EMPTY;
 
 		for(int i = 0; i < var1.getSizeInventory(); i++) {
 			ItemStack stack = var1.getStackInSlot(i);
-			if(stack != null) {
+			if(!stack.isEmpty()) {
 				if(stack.getItem() == ModItems.tool)
 					tool = stack;
 				else target = stack;
@@ -60,7 +61,7 @@ public class AttachementRecipe implements IRecipe {
 		String mod = MorphingHandler.getModFromStack(target);
 
 		if(morphData.hasKey(mod))
-			return null;
+			return ItemStack.EMPTY;
 
 		NBTTagCompound modCmp = new NBTTagCompound();
 		target.writeToNBT(modCmp);
@@ -70,7 +71,7 @@ public class AttachementRecipe implements IRecipe {
 	}
 
 	public boolean isTarget(ItemStack stack) {
-		if(stack == null || MorphingHandler.isMorphTool(stack))
+		if(stack.isEmpty() || MorphingHandler.isMorphTool(stack))
 			return false;
 
 		String mod = MorphingHandler.getModFromStack(stack);
@@ -103,12 +104,12 @@ public class AttachementRecipe implements IRecipe {
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		return null;
+		return ItemStack.EMPTY;
 	}
 
 	@Override
-	public ItemStack[] getRemainingItems(InventoryCrafting inv) {
-		return new ItemStack[inv.getSizeInventory()];
+	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 	}
 
 }
