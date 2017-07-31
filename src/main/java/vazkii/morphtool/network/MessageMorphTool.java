@@ -23,7 +23,7 @@ public class MessageMorphTool extends NetworkMessage{
 
     @Override
     public IMessage handleMessage(MessageContext context) {
-        EntityPlayer player = context.getServerHandler().playerEntity;
+        EntityPlayer player = context.getServerHandler().player;
         ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
         if(MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem) ) {
             player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift ? player.inventory.getSizeInventory() - 1 : slot, stack);
