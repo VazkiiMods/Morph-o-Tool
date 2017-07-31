@@ -1,6 +1,7 @@
 package vazkii.morphtool;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -10,9 +11,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.oredict.RecipeSorter;
-import net.minecraftforge.oredict.RecipeSorter.Category;
 import vazkii.arl.item.ItemMod;
 
 import java.util.List;
@@ -24,8 +22,7 @@ public class ItemMorphTool extends ItemMod {
 		setMaxStackSize(1);
 		setCreativeTab(CreativeTabs.TOOLS);
 
-		GameRegistry.addRecipe(new AttachementRecipe());
-		RecipeSorter.register("morphtool:attachment", AttachementRecipe.class, Category.SHAPELESS, "");
+		new AttachementRecipe();
 	}
 
 	@Override
@@ -35,9 +32,9 @@ public class ItemMorphTool extends ItemMod {
 
 		return rotated ? EnumActionResult.SUCCESS : EnumActionResult.PASS;
 	}
-
+	
 	@Override
-	public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced) {
+	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag advanced) {
 		if(!stack.hasTagCompound() || !stack.getTagCompound().hasKey(MorphingHandler.TAG_MORPH_TOOL_DATA))
 			return;
 

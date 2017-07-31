@@ -2,13 +2,17 @@ package vazkii.morphtool;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import vazkii.arl.recipe.ModRecipe;
 
-public class AttachementRecipe implements IRecipe {
+public class AttachementRecipe extends ModRecipe {
+
+	public AttachementRecipe() {
+		super(new ResourceLocation("morphtool", "attachment"));
+	}
 
 	@Override
 	public boolean matches(InventoryCrafting var1, World var2) {
@@ -98,11 +102,6 @@ public class AttachementRecipe implements IRecipe {
 	}
 
 	@Override
-	public int getRecipeSize() {
-		return 10;
-	}
-
-	@Override
 	public ItemStack getRecipeOutput() {
 		return ItemStack.EMPTY;
 	}
@@ -110,6 +109,11 @@ public class AttachementRecipe implements IRecipe {
 	@Override
 	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
 		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+	}
+
+	@Override
+	public boolean func_194133_a(int p_194133_1_, int p_194133_2_) {
+		return false;
 	}
 
 }
