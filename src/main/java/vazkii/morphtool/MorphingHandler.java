@@ -62,8 +62,8 @@ public final class MorphingHandler {
 			return;
 
 		EntityItem e = event.getEntityItem();
-		ItemStack stack = e.getEntityItem();
-		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setEntityItemStack(copy));
+		ItemStack stack = e.getItem();
+		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setItem(copy));
 	}
 	
 	@SubscribeEvent
