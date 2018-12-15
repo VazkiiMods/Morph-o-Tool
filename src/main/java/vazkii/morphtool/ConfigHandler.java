@@ -35,8 +35,18 @@ public class ConfigHandler {
 		allItems = loadPropBool("Allow all items to be added", false);
 		invertHandShift = loadPropBool("Morph in the offhand instead of mainhand", false);
 		
-		whitelistedItems = loadPropStringList("Whitelisted Items", "botania:twigwand", "appliedenergistics2:network_tool");
-		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator");
+		whitelistedItems = loadPropStringList("Whitelisted Items", 
+									"botania:twigwand",
+									"appliedenergistics2:network_tool",
+									"immersiveengineering:tool",
+									"buildersguides:mallet",
+									"environmentaltech:tool_multiblock_assembler",
+									"bloodmagic:itemritualreader",
+									"draconicevolution:crystal_binder",
+									"crossroads:omnimeter");
+		
+		whitelistedNames = loadPropStringList("Whitelisted Names", "wrench", "screwdriver", "hammer", "rotator", "configurator", "crowbar");
+		
 		blacklistedMods = loadPropStringList("Blacklisted Mods", "tconstruct", "intangible");
 
 		aliases.clear();
@@ -45,7 +55,21 @@ public class ConfigHandler {
 				"thermalexpansion=thermalfoundation",
 				"thermaldynamics=thermalfoundation",
 				"thermalcultivation=thermalfoundation", 
-				"rftoolsdim=rftools");
+				"redstonearsenal=thermalfoundation",
+				"rftoolsdim=rftools",
+				"rftoolspower=rftools",
+				"rftoolscontrol=rftools",
+				"ae2stuff=appliedenergistics2",
+				"animus=bloodmagic",
+				"integrateddynamics=integratedtunnels",
+				"mekanismgenerators=mekanism",
+				"mekanismtools=mekanism",
+				"deepresonance=rftools",
+				"xnet=rftools",
+				"buildcrafttransport=buildcraft",
+				"buildcraftfactory=buildcraft",
+				"buildcraftsilicon=buildcraft");
+		
 		for(String s : aliasesList)
 			if(s.matches(".+?=.+")) {
 				String[] tokens = s.toLowerCase().split("=");
