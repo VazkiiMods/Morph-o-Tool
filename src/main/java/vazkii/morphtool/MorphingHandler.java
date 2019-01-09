@@ -1,28 +1,26 @@
 package vazkii.morphtool;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public final class MorphingHandler {
 
@@ -33,28 +31,6 @@ public final class MorphingHandler {
 	public static final String TAG_MORPHING_TOOL = "morphtool:is_morphing";
 	public static final String TAG_MORPH_TOOL_DATA = "morphtool:data";
 	public static final String TAG_MORPH_TOOL_DISPLAY_NAME = "morphtool:displayName";
-
-	@SubscribeEvent
-	public void onPlayerTick(LivingUpdateEvent event) {
-		if(event.getEntity() instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) event.getEntity();
-			ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
-
-			if(isMorphTool(mainHandItem)) {
-				RayTraceResult res = raycast(player, 4.5);
-				if(res != null) {
-					IBlockState state = player.getEntityWorld().getBlockState(res.getBlockPos());
-					String mod = getModFromState(state);
-
-					ItemStack newStack = getShiftStackForMod(mainHandItem, mod);
-					if(newStack != mainHandItem && !ItemStack.areItemsEqual(newStack, mainHandItem)) {
-						player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift ? player.inventory.getSizeInventory() - 1 : player.inventory.currentItem, newStack);
-						MorphTool.proxy.updateEquippedItem();
-					}
-				}
-			}
-		}
-	}
 
 	@SubscribeEvent
 	public void onItemDropped(ItemTossEvent event) {

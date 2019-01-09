@@ -28,6 +28,18 @@ version = "${config.version}-${config.build_number}"
 group = "vazkii.morphtool" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = config.mod_name
 
+repositories {
+    maven {
+        // for AutoRegLib
+        name "blamejared"
+        url "http://maven.blamejared.com/"
+    }
+}
+
+dependencies {
+    compile "vazkii.autoreglib:AutoRegLib:${config.arl_version}"
+}
+
 minecraft {
     version = "${config.mc_version}-${config.forge_version}"
     runDir = "eclipse/assets"

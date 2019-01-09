@@ -1,7 +1,5 @@
 package vazkii.morphtool;
 
-import java.util.List;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
@@ -14,6 +12,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import vazkii.arl.item.ItemMod;
+
+import java.util.List;
 
 public class ItemMorphTool extends ItemMod {
 

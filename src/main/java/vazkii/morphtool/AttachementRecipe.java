@@ -74,6 +74,11 @@ public class AttachementRecipe extends ModRecipe {
 		return copy;
 	}
 
+	@Override
+	public boolean canFit(int width, int height) {
+		return false;
+	}
+
 	public boolean isTarget(ItemStack stack) {
 		if(stack.isEmpty() || MorphingHandler.isMorphTool(stack))
 			return false;
@@ -111,9 +116,5 @@ public class AttachementRecipe extends ModRecipe {
 		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 	}
 
-	@Override
-	public boolean canFit(int p_194133_1_, int p_194133_2_) {
-		return false;
-	}
 
 }

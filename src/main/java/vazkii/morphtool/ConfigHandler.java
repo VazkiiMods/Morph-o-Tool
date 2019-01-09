@@ -41,7 +41,7 @@ public class ConfigHandler {
 									"immersiveengineering:tool",
 									"buildersguides:mallet",
 									"environmentaltech:tool_multiblock_assembler",
-									"bloodmagic:itemritualreader",
+									"bloodmagic:ritual_reader",
 									"draconicevolution:crystal_binder",
 									"crossroads:omnimeter");
 		
