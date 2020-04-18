@@ -1,21 +1,24 @@
 package vazkii.morphtool;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -34,56 +37,56 @@ public final class MorphingHandler {
 
 	@SubscribeEvent
 	public void onItemDropped(ItemTossEvent event) {
-		if(!event.getPlayer().isSneaking())
+		if(!event.getPlayer().isCrouching())
 			return;
 
-		EntityItem e = event.getEntityItem();
+		ItemEntity e = event.getEntityItem();
 		ItemStack stack = e.getItem();
 		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setItem(copy));
 	}
 	
 	@SubscribeEvent
 	public void onItemBroken(PlayerDestroyItemEvent event) {
-		removeItemFromTool(event.getEntityPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getEntityPlayer().setHeldItem(event.getHand(), morph));
+		removeItemFromTool(event.getPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getPlayer().setHeldItem(event.getHand(), morph));
 	}
 	
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
 		if(!stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
-			NBTTagCompound morphData = (NBTTagCompound) stack.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA).copy();
+			CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
-			NBTTagCompound newMorphData = morph.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA);
-			newMorphData.removeTag(getModFromStack(stack));
+			CompoundNBT newMorphData = morph.getTag().getCompound(TAG_MORPH_TOOL_DATA);
+			newMorphData.remove(getModFromStack(stack));
 
 			if(!itemBroken) {
 				if(!e.getEntityWorld().isRemote) {
-					EntityItem newItem = new EntityItem(e.getEntityWorld(), e.posX, e.posY, e.posZ, morph);
-					e.getEntityWorld().spawnEntity(newItem);
+					ItemEntity newItem = new ItemEntity(e.getEntityWorld(), e.serverPosX, e.serverPosY, e.serverPosZ, morph);
+					e.getEntityWorld().addEntity(newItem);
 				}
 
 				ItemStack copy = stack.copy();
-				NBTTagCompound copyCmp = copy.getTagCompound();
+				CompoundNBT copyCmp = copy.getTag();
 				if(copyCmp == null) {
-					copyCmp = new NBTTagCompound();
-					copy.setTagCompound(copyCmp);
+					copyCmp = new CompoundNBT();
+					copy.setTag(copyCmp);
 				}
 
-				copyCmp.removeTag("display");
+				copyCmp.remove("display");
 				String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName()))
-					copy.setStackDisplayName(displayName);
+					copy.setDisplayName(new StringTextComponent(displayName));
 
-				copyCmp.removeTag(TAG_MORPHING_TOOL);
-				copyCmp.removeTag(TAG_MORPH_TOOL_DISPLAY_NAME);
-				copyCmp.removeTag(TAG_MORPH_TOOL_DATA);
+				copyCmp.remove(TAG_MORPHING_TOOL);
+				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
+				copyCmp.remove(TAG_MORPH_TOOL_DATA);
 
 				consumer.accept(copy);
 			} else consumer.accept(morph);
 		}
 	}
 
-	public static String getModFromState(IBlockState state) {
-		return getModOrAlias(state.getBlock().getRegistryName().getResourceDomain());
+	public static String getModFromState(BlockState state) {
+		return getModOrAlias(state.getBlock().getRegistryName().getNamespace());
 	}
 
 	public static String getModFromStack(ItemStack stack) {
@@ -91,59 +94,68 @@ public final class MorphingHandler {
 	}
 	
 	public static String getModOrAlias(String mod) {
-		return ConfigHandler.aliases.containsKey(mod) ? ConfigHandler.aliases.get(mod) : mod;
+
+		Map<String, String> aliases = new HashMap<>();
+
+		for(String s : ConfigHandler.aliasesList.get())
+			if(s.matches(".+?=.+")) {
+				String[] tokens = s.toLowerCase().split("=");
+				aliases.put(tokens[0], tokens[1]);
+			}
+
+		return aliases.getOrDefault(mod, mod);
 	}
 
 	public static ItemStack getShiftStackForMod(ItemStack stack, String mod) {
-		if(!stack.hasTagCompound())
+		if(!stack.hasTag())
 			return stack;
 
 		String currentMod = getModFromStack(stack);
 		if(mod.equals(currentMod))
 			return stack;
 
-		NBTTagCompound morphData = stack.getTagCompound().getCompoundTag(TAG_MORPH_TOOL_DATA);
+		CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA);
 		return makeMorphedStack(stack, mod, morphData);
 	}
 
-	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, NBTTagCompound morphData) {
+	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, CompoundNBT morphData) {
 		String currentMod = getModFromStack(currentStack);
 
-		NBTTagCompound currentCmp = new NBTTagCompound();
-		currentStack.writeToNBT(currentCmp);
-		currentCmp = (NBTTagCompound) currentCmp.copy();
-		if(currentCmp.hasKey("tag"))
-			currentCmp.getCompoundTag("tag").removeTag(TAG_MORPH_TOOL_DATA);
+		CompoundNBT currentCmp = new CompoundNBT();
+		currentStack.write(currentCmp);
+		currentCmp = currentCmp.copy();
+		if(currentCmp.contains("tag"))
+			currentCmp.getCompound("tag").remove(TAG_MORPH_TOOL_DATA);
 
 		if(!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID))
-			morphData.setTag(currentMod, currentCmp);
+			morphData.put(currentMod, currentCmp);
 
 		ItemStack stack;
 		if(targetMod.equals(MINECRAFT))
 			stack = new ItemStack(ModItems.tool);
 		else {
-			NBTTagCompound targetCmp = morphData.getCompoundTag(targetMod);
-			morphData.removeTag(targetMod);
+			CompoundNBT targetCmp = morphData.getCompound(targetMod);
+			morphData.remove(targetMod);
 
-			stack = new ItemStack(targetCmp);
+			stack = ItemStack.read(targetCmp);
 			if(stack.isEmpty())
 				stack = new ItemStack(ModItems.tool);
 		}
 
-		if(!stack.hasTagCompound())
-			stack.setTagCompound(new NBTTagCompound());
+		if(!stack.hasTag())
+			stack.setTag(new CompoundNBT());
 
-		NBTTagCompound stackCmp = stack.getTagCompound();
-		stackCmp.setTag(TAG_MORPH_TOOL_DATA, morphData);
-		stackCmp.setBoolean(TAG_MORPHING_TOOL, true);
+		CompoundNBT stackCmp = stack.getTag();
+		stackCmp.put(TAG_MORPH_TOOL_DATA, morphData);
+		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
 		if(stack.getItem() != ModItems.tool) {
-			String displayName = stack.getDisplayName();
-			if(stackCmp.hasKey(TAG_MORPH_TOOL_DISPLAY_NAME))
+			String displayName = stack.getDisplayName().getString();
+			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
-			else stackCmp.setString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
+			else stackCmp.putString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			stack.setStackDisplayName(TextFormatting.RESET + I18n.translateToLocalFormatted("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET));
+			stack.setDisplayName(new StringTextComponent( TextFormatting.RESET + I18n.format("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET)));
 		}
 
 		stack.setCount(1);
@@ -153,8 +165,8 @@ public final class MorphingHandler {
 	private static final Map<String, String> modNames = new HashMap<String, String>();
 
 	static {
-		for(Map.Entry<String, ModContainer> modEntry : Loader.instance().getIndexedModList().entrySet())
-			modNames.put(modEntry.getKey().toLowerCase(Locale.ENGLISH),  modEntry.getValue().getName());
+		for(ModInfo modEntry : ModList.get().getMods())
+			modNames.put(modEntry.getModId().toLowerCase(Locale.ENGLISH),  modEntry.getDisplayName());
 	}
 
 	public static String getModNameForId(String modId) {
@@ -169,24 +181,23 @@ public final class MorphingHandler {
 		if(stack.getItem() == ModItems.tool)
 			return true;
 
-		return stack.hasTagCompound() && stack.getTagCompound().getBoolean(TAG_MORPHING_TOOL);
+		return stack.hasTag() && stack.getTag().getBoolean(TAG_MORPHING_TOOL);
 	}
 
 	public static RayTraceResult raycast(Entity e, double len) {
-		Vec3d vec = new Vec3d(e.posX, e.posY, e.posZ);
-		if(e instanceof EntityPlayer)
+		Vec3d vec = new Vec3d(e.getPosX(), e.getPosY(), e.getPosZ());
+		if(e instanceof PlayerEntity)
 			vec = vec.add(new Vec3d(0, e.getEyeHeight(), 0));
 
 		Vec3d look = e.getLookVec();
 		if(look == null)
 			return null;
 
-		return raycast(e.getEntityWorld(), vec, look, len);
+		return raycast(e, vec, look, len);
 	}
 
-	public static RayTraceResult raycast(World world, Vec3d origin, Vec3d ray, double len) {
+	public static RayTraceResult raycast(Entity e, Vec3d origin, Vec3d ray, double len) {
 		Vec3d end = origin.add(ray.normalize().scale(len));
-		RayTraceResult pos = world.rayTraceBlocks(origin, end);
-		return pos;
+		return e.getEntityWorld().rayTraceBlocks(new RayTraceContext(origin, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, e));
 	}
 }

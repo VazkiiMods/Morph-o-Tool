@@ -1,15 +1,14 @@
 package vazkii.morphtool.network;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import vazkii.arl.network.NetworkMessage;
+import net.minecraft.util.Hand;
+import net.minecraftforge.fml.network.NetworkEvent;
+import vazkii.arl.network.IMessage;
 import vazkii.morphtool.ConfigHandler;
 import vazkii.morphtool.MorphingHandler;
 
-public class MessageMorphTool extends NetworkMessage{
+public class MessageMorphTool implements IMessage {
 
     public ItemStack stack;
     public int slot;
@@ -21,15 +20,16 @@ public class MessageMorphTool extends NetworkMessage{
         this.slot = slot;
     }
 
+
     @Override
-    public IMessage handleMessage(MessageContext context) {
-        EntityPlayer player = context.getServerHandler().player;
-        ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
-        if(MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem) ) {
-            player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift ? player.inventory.getSizeInventory() - 1 : slot, stack);
+    public boolean receive(NetworkEvent.Context context) {
+        PlayerEntity player = context.getSender();
+        if(player != null) {
+            ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem)) {
+                player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : slot, stack);
+            }
         }
-        return null;
+        return true;
     }
-
-
 }
