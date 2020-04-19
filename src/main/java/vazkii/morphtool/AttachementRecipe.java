@@ -1,21 +1,22 @@
 package vazkii.morphtool;
 
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import vazkii.arl.recipe.ModRecipe;
 
-public class AttachementRecipe extends ModRecipe {
+public class AttachementRecipe extends SpecialRecipe {
 
-	public AttachementRecipe() {
-		super(new ResourceLocation("morphtool", "attachment"));
+	public AttachementRecipe(ResourceLocation idIn) {
+		super(idIn);
 	}
 
 	@Override
-	public boolean matches(InventoryCrafting var1, World var2) {
+	public boolean matches(CraftingInventory var1, World var2) {
 		boolean foundTool = false;
 		boolean foundTarget = false;
 
@@ -38,7 +39,7 @@ public class AttachementRecipe extends ModRecipe {
 	}
 
 	@Override
-	public ItemStack getCraftingResult(InventoryCrafting var1) {
+	public ItemStack getCraftingResult(CraftingInventory var1) {
 		ItemStack tool = ItemStack.EMPTY;
 		ItemStack target = ItemStack.EMPTY;
 
@@ -52,31 +53,31 @@ public class AttachementRecipe extends ModRecipe {
 		}
 
 		ItemStack copy = tool.copy();
-		NBTTagCompound cmp = copy.getTagCompound();
+		CompoundNBT cmp = copy.getTag();
 		if(cmp == null) {
-			cmp = new NBTTagCompound();
-			copy.setTagCompound(cmp);
+			cmp = new CompoundNBT();
+			copy.setTag(cmp);
 		}
 
-		if(!cmp.hasKey(MorphingHandler.TAG_MORPH_TOOL_DATA))
-			cmp.setTag(MorphingHandler.TAG_MORPH_TOOL_DATA, new NBTTagCompound());
+		if(!cmp.contains(MorphingHandler.TAG_MORPH_TOOL_DATA))
+			cmp.put(MorphingHandler.TAG_MORPH_TOOL_DATA, new CompoundNBT());
 
-		NBTTagCompound morphData = cmp.getCompoundTag(MorphingHandler.TAG_MORPH_TOOL_DATA);
+		CompoundNBT morphData = cmp.getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
 		String mod = MorphingHandler.getModFromStack(target);
 
-		if(morphData.hasKey(mod))
+		if(morphData.contains(mod))
 			return ItemStack.EMPTY;
 
-		NBTTagCompound modCmp = new NBTTagCompound();
-		target.writeToNBT(modCmp);
-		morphData.setTag(mod, modCmp);
+		CompoundNBT modCmp = new CompoundNBT();
+		target.write(modCmp);
+		morphData.put(mod, modCmp);
 
 		return copy;
 	}
 
 	@Override
 	public boolean canFit(int width, int height) {
-		return false;
+		return width * height >= 2;
 	}
 
 	public boolean isTarget(ItemStack stack) {
@@ -87,19 +88,19 @@ public class AttachementRecipe extends ModRecipe {
 		if(mod.equals(MorphingHandler.MINECRAFT))
 			return false;
 
-		if(ConfigHandler.allItems)
+		if(ConfigHandler.allItems.get())
 			return true;
 
-		if(ConfigHandler.blacklistedMods.contains(mod))
+		if(ConfigHandler.blacklistedMods.get().contains(mod))
 			return false;
 
 		ResourceLocation registryNameRL = stack.getItem().getRegistryName();
 		String registryName = registryNameRL.toString();
-		if(ConfigHandler.whitelistedItems.contains(registryName) || ConfigHandler.whitelistedItems.contains(registryName + ":" + stack.getItemDamage()))
+		if(ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamage()))
 			return true;
 
-		String itemName = registryNameRL.getResourcePath().toLowerCase();
-		for(String s : ConfigHandler.whitelistedNames)
+		String itemName = registryNameRL.getPath().toLowerCase();
+		for(String s : ConfigHandler.whitelistedNames.get())
 			if(itemName.contains(s.toLowerCase()))
 				return true;
 
@@ -112,9 +113,13 @@ public class AttachementRecipe extends ModRecipe {
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
+	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
 		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 	}
 
+	@Override
+	public IRecipeSerializer<?> getSerializer() {
+		return RecipeSerializer.ATTACHMENT;
+	}
 
 }

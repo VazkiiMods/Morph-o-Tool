@@ -1,32 +1,37 @@
 package vazkii.morphtool;
 
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.network.NetworkDirection;
 import vazkii.arl.network.NetworkHandler;
 import vazkii.morphtool.network.MessageMorphTool;
+import vazkii.morphtool.proxy.ClientProxy;
 import vazkii.morphtool.proxy.CommonProxy;
 
-@Mod(modid = MorphTool.MOD_ID, name = MorphTool.MOD_NAME, version = MorphTool.VERSION, dependencies = MorphTool.DEPENDENCIES, guiFactory = MorphTool.GUI_FACTORY)
+@Mod(MorphTool.MOD_ID)
 public class MorphTool {
 
 	public static final String MOD_ID = "morphtool";
-	public static final String MOD_NAME = "Morph-o-Tool";
-	public static final String BUILD = "GRADLE:BUILD";
-	public static final String VERSION = "GRADLE:VERSION-" + BUILD;
-	public static final String DEPENDENCIES = "required-before:autoreglib";
-	public static final String GUI_FACTORY = "vazkii.morphtool.GuiFactory";
-
-	@SidedProxy(clientSide = "vazkii.morphtool.proxy.ClientProxy", serverSide = "vazkii.morphtool.proxy.CommonProxy")
+	public static NetworkHandler NETWORKHANDLER;
 	public static CommonProxy proxy;
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
-		ConfigHandler.init(event.getSuggestedConfigurationFile());
-		NetworkHandler.register(MessageMorphTool.class, Side.SERVER);
+	public MorphTool(){
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.CONFIG_SPEC);
+
+		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 		proxy.preInit();
+
+		NETWORKHANDLER = new NetworkHandler(MOD_ID, 1);
+	}
+
+	public void commonSetup(FMLCommonSetupEvent event) {
+		new ModItems();
+		NETWORKHANDLER.register(MessageMorphTool.class, NetworkDirection.PLAY_TO_SERVER);
 	}
 
 }

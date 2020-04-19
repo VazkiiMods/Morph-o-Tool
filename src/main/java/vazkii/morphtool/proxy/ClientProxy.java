@@ -1,7 +1,7 @@
 package vazkii.morphtool.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraftforge.common.MinecraftForge;
 import vazkii.morphtool.ClientHandler;
 import vazkii.morphtool.ConfigHandler;
@@ -16,7 +16,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void updateEquippedItem() {
-		Minecraft.getMinecraft().entityRenderer.itemRenderer.resetEquippedProgress(ConfigHandler.invertHandShift ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
+		Minecraft.getInstance().gameRenderer.itemRenderer.resetEquippedProgress(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
 	}
 
 }
