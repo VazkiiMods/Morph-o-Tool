@@ -29,7 +29,7 @@ public class ConfigHandler {
 		invertHandShift = builder.define("Morph in the offhand instead of mainhand", false);
 		
 		whitelistedItems = builder.define("Whitelisted Items",
-				Arrays.asList("botania:twigwand",
+				Arrays.asList("botania:twig_wand",
 									"appliedenergistics2:network_tool",
 									"immersiveengineering:tool",
 									"buildersguides:mallet",

@@ -23,7 +23,6 @@ public class ItemMorphTool extends BasicItem {
 
 	public ItemMorphTool() {
 		super("morphtool:tool", new Properties().maxStackSize(1).group(ItemGroup.TOOLS));
-		new AttachementRecipe();
 	}
 
 	@Override

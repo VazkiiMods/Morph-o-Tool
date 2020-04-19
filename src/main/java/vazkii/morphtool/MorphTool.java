@@ -24,9 +24,9 @@ public class MorphTool {
 	public static NetworkHandler NETWORKHANDLER;
 	public static CommonProxy proxy;
 
-
 	public MorphTool(){
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.CONFIG_SPEC);
 
 		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 		proxy.preInit();
@@ -35,7 +35,6 @@ public class MorphTool {
 	}
 
 	public void commonSetup(FMLCommonSetupEvent event) {
-		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.CONFIG_SPEC);
 		new ModItems();
 		NETWORKHANDLER.register(MessageMorphTool.class, NetworkDirection.PLAY_TO_SERVER);
 	}

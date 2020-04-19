@@ -2,13 +2,20 @@ package vazkii.morphtool;
 
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipeSerializer;
+import net.minecraft.item.crafting.SpecialRecipe;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
-public class AttachementRecipe {
+public class AttachementRecipe extends SpecialRecipe {
 
+	public AttachementRecipe(ResourceLocation idIn) {
+		super(idIn);
+	}
+
+	@Override
 	public boolean matches(CraftingInventory var1, World var2) {
 		boolean foundTool = false;
 		boolean foundTarget = false;
@@ -31,6 +38,7 @@ public class AttachementRecipe {
 		return foundTool && foundTarget;
 	}
 
+	@Override
 	public ItemStack getCraftingResult(CraftingInventory var1) {
 		ItemStack tool = ItemStack.EMPTY;
 		ItemStack target = ItemStack.EMPTY;
@@ -67,8 +75,9 @@ public class AttachementRecipe {
 		return copy;
 	}
 
+	@Override
 	public boolean canFit(int width, int height) {
-		return false;
+		return width * height >= 2;
 	}
 
 	public boolean isTarget(ItemStack stack) {
@@ -98,13 +107,19 @@ public class AttachementRecipe {
 		return false;
 	}
 
+	@Override
 	public ItemStack getRecipeOutput() {
 		return ItemStack.EMPTY;
 	}
 
+	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
 		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
 	}
 
+	@Override
+	public IRecipeSerializer<?> getSerializer() {
+		return RecipeSerializer.ATTACHMENT;
+	}
 
 }
