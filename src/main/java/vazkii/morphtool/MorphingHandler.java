@@ -198,6 +198,6 @@ public final class MorphingHandler {
 
 	public static RayTraceResult raycast(Entity e, Vec3d origin, Vec3d ray, double len) {
 		Vec3d end = origin.add(ray.normalize().scale(len));
-		return e.getEntityWorld().rayTraceBlocks(new RayTraceContext(origin, end, RayTraceContext.BlockMode.COLLIDER, RayTraceContext.FluidMode.NONE, e));
+		return e.getEntityWorld().rayTraceBlocks(new RayTraceContext(origin, end, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, e));
 	}
 }

@@ -16,11 +16,6 @@ import vazkii.morphtool.proxy.CommonProxy;
 public class MorphTool {
 
 	public static final String MOD_ID = "morphtool";
-	public static final String MOD_NAME = "Morph-o-Tool";
-	public static final String BUILD = "GRADLE:BUILD";
-	public static final String VERSION = "GRADLE:VERSION-" + BUILD;
-	public static final String DEPENDENCIES = "required-before:autoreglib";
-	public static final String GUI_FACTORY = "vazkii.morphtool.GuiFactory";
 	public static NetworkHandler NETWORKHANDLER;
 	public static CommonProxy proxy;
 

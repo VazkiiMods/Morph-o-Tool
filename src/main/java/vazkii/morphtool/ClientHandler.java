@@ -28,17 +28,16 @@ public class ClientHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onMouseEvent(InputEvent.RawMouseEvent event) {
         PlayerEntity player = Minecraft.getInstance().player;
-        if(player != null) {
+        if(player != null && autoMode) {
             ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             if (MorphingHandler.isMorphTool(mainHandItem)) {
                 ItemStack newStack = mainHandItem;
                 RayTraceResult res = MorphingHandler.raycast(player, 4.5);
-                String modlook = "";
 
                 //Get looked at Mod
                 if (res != null && res.getType() == RayTraceResult.Type.BLOCK) {
                     BlockState state = player.world.getBlockState(((BlockRayTraceResult) res).getPos());
-                    modlook = MorphingHandler.getModFromState(state);
+                    String modlook = MorphingHandler.getModFromState(state);
                     //Morph tool to looked at Mod
                     newStack = MorphingHandler.getShiftStackForMod(mainHandItem, modlook);
                 }
@@ -60,7 +59,14 @@ public class ClientHandler {
             if (MorphingHandler.isMorphTool(mainHandItem)) {
                 ItemStack newStack = mainHandItem;
                 String mod = MorphingHandler.getModFromStack(mainHandItem);
+                RayTraceResult res = MorphingHandler.raycast(player, 4.5);
                 String modlook = "";
+
+                //Get looked at Mod
+                if (res != null && res.getType() == RayTraceResult.Type.BLOCK) {
+                    BlockState state = player.world.getBlockState(((BlockRayTraceResult) res).getPos());
+                    modlook = MorphingHandler.getModFromState(state);
+                }
 
                 //Manual Scroll for Morph (excluding looked at a mod block incase it also needs scrolling)
                 if (event.getScrollDelta() != 0 && player.isCrouching() && !modlook.equals(mod)) {
