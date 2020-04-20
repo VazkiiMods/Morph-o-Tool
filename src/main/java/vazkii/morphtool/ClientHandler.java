@@ -11,8 +11,11 @@ import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.event.TickEvent.ClientTickEvent;
+import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import vazkii.arl.util.ClientTicker;
 import vazkii.morphtool.network.MessageMorphTool;
 
 import java.util.ArrayList;
@@ -26,11 +29,12 @@ public class ClientHandler {
     protected static boolean autoMode = true;
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onMouseEvent(InputEvent.RawMouseEvent event) {
+    public void onTick(ClientTickEvent event) {
         PlayerEntity player = Minecraft.getInstance().player;
-        if(player != null && autoMode) {
+        if(player != null && event.phase == Phase.END && autoMode) {
             ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             if (MorphingHandler.isMorphTool(mainHandItem)) {
+            	System.out.println("do be morphin tho");
                 ItemStack newStack = mainHandItem;
                 RayTraceResult res = MorphingHandler.raycast(player, 4.5);
 

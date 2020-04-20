@@ -10,7 +10,6 @@ import java.util.Map;
 
 public class ConfigHandler {
 
-
 	public static ForgeConfigSpec.BooleanValue allItems;
 	public static ForgeConfigSpec.BooleanValue invertHandShift;
 	public static ForgeConfigSpec.ConfigValue<List<String>> whitelistedItems, whitelistedNames, blacklistedMods;
