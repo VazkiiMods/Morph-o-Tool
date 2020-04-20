@@ -34,7 +34,6 @@ public class ClientHandler {
         if(player != null && event.phase == Phase.END && autoMode) {
             ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             if (MorphingHandler.isMorphTool(mainHandItem)) {
-            	System.out.println("do be morphin tho");
                 ItemStack newStack = mainHandItem;
                 RayTraceResult res = MorphingHandler.raycast(player, 4.5);
 
