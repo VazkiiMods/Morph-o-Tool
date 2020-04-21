@@ -1,7 +1,11 @@
 package vazkii.morphtool;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import net.minecraft.block.BlockState;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -10,20 +14,15 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public final class MorphingHandler {
 
@@ -44,12 +43,12 @@ public final class MorphingHandler {
 		ItemStack stack = e.getItem();
 		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setItem(copy));
 	}
-	
+
 	@SubscribeEvent
 	public void onItemBroken(PlayerDestroyItemEvent event) {
 		removeItemFromTool(event.getPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getPlayer().setHeldItem(event.getHand(), morph));
 	}
-	
+
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
 		if(!stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
@@ -73,8 +72,8 @@ public final class MorphingHandler {
 
 				copyCmp.remove("display");
 				String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
-				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName()))
-					copy.setDisplayName(new StringTextComponent(displayName));
+				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName().getString()))
+					copy.setDisplayName(ITextComponent.Serializer.fromJson(displayName));
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -92,7 +91,7 @@ public final class MorphingHandler {
 	public static String getModFromStack(ItemStack stack) {
 		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getCreatorModId(stack));
 	}
-	
+
 	public static String getModOrAlias(String mod) {
 
 		Map<String, String> aliases = new HashMap<>();
@@ -150,12 +149,14 @@ public final class MorphingHandler {
 		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
 		if(stack.getItem() != ModItems.tool) {
-			String displayName = stack.getDisplayName().getString();
+			String displayName = ITextComponent.Serializer.toJson(stack.getDisplayName());
 			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.putString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			stack.setDisplayName(new StringTextComponent( TextFormatting.RESET + I18n.format("morphtool.sudo_name", TextFormatting.GREEN + displayName + TextFormatting.RESET)));
+			ITextComponent stackName = ITextComponent.Serializer.fromJson(displayName).setStyle(new Style().setColor(TextFormatting.GREEN));
+			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
+			stack.setDisplayName(comp);
 		}
 
 		stack.setCount(1);

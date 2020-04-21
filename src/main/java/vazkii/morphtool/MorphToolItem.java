@@ -1,5 +1,10 @@
 package vazkii.morphtool;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.block.BlockState;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemGroup;
@@ -10,18 +15,13 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import vazkii.arl.item.BasicItem;
 import vazkii.arl.util.TooltipHandler;
 
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+public class MorphToolItem extends BasicItem {
 
-public class ItemMorphTool extends BasicItem {
-
-	public ItemMorphTool() {
+	public MorphToolItem() {
 		super("morphtool:tool", new Properties().maxStackSize(1).group(ItemGroup.TOOLS));
 	}
 
@@ -52,8 +52,9 @@ public class ItemMorphTool extends BasicItem {
 						String name = modStack.getDisplayName().getString();
 						if(modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
 							name = modStack.getTag().getString(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME);
+						String mod = MorphingHandler.getModFromStack(modStack);
 
-						tooltip.add(new TranslationTextComponent(" " + MorphingHandler.getModNameForId(s) + " : " + name));
+						tooltip.add(new StringTextComponent(" " + mod + " : " + name));
 					}
 				}
 			}

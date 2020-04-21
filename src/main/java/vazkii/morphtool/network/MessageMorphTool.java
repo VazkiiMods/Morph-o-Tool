@@ -10,7 +10,9 @@ import vazkii.morphtool.MorphingHandler;
 
 public class MessageMorphTool implements IMessage {
 
-    public ItemStack stack;
+	private static final long serialVersionUID = 8883750897743016439L;
+	
+	public ItemStack stack;
     public int slot;
 
     public MessageMorphTool() {}
@@ -25,10 +27,12 @@ public class MessageMorphTool implements IMessage {
     public boolean receive(NetworkEvent.Context context) {
         PlayerEntity player = context.getSender();
         if(player != null) {
-            ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
-            if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem)) {
-                player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : slot, stack);
-            }
+        	context.enqueueWork(() -> {
+        		ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem)) {
+                    player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : slot, stack);
+                }
+        	});
         }
         return true;
     }

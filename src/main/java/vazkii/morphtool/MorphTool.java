@@ -25,12 +25,13 @@ public class MorphTool {
 
 		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 		proxy.preInit();
+		
+		ModItems.init();
 
 		NETWORKHANDLER = new NetworkHandler(MOD_ID, 1);
 	}
 
 	public void commonSetup(FMLCommonSetupEvent event) {
-		new ModItems();
 		NETWORKHANDLER.register(MessageMorphTool.class, NetworkDirection.PLAY_TO_SERVER);
 	}
 
