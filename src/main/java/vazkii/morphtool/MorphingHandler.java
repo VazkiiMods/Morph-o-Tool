@@ -89,7 +89,8 @@ public final class MorphingHandler {
 	}
 
 	public static String getModFromStack(ItemStack stack) {
-		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getCreatorModId(stack) != null ? stack.getItem().getCreatorModId(stack) : MINECRAFT);
+		String modId = stack.getItem().getCreatorModId(stack);
+		return getModOrAlias(stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT);
 	}
 
 	public static String getModOrAlias(String mod) {
