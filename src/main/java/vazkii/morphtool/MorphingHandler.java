@@ -41,7 +41,7 @@ public final class MorphingHandler {
 
 		ItemEntity e = event.getEntityItem();
 		ItemStack stack = e.getItem();
-		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setItem(copy));
+		removeItemFromTool(e, stack, false, e::setItem);
 	}
 
 	@SubscribeEvent
@@ -50,7 +50,7 @@ public final class MorphingHandler {
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if(!stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
+		if(stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
@@ -89,7 +89,7 @@ public final class MorphingHandler {
 	}
 
 	public static String getModFromStack(ItemStack stack) {
-		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getCreatorModId(stack));
+		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getCreatorModId(stack) != null ? stack.getItem().getCreatorModId(stack) : MINECRAFT);
 	}
 
 	public static String getModOrAlias(String mod) {
