@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[32,)"
 issueTrackerURL="https://github.com/Vazkii/Morph-o-Tool"
+license="Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License"
 
 [[mods]]
 modId="morphtool"
