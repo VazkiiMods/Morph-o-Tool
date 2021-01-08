@@ -58,7 +58,7 @@ public final class MorphingHandler {
 
 			if(!itemBroken) {
 				if(!e.getEntityWorld().isRemote) {
-					ItemEntity newItem = new ItemEntity(e.getEntityWorld(), e.serverPosX, e.serverPosY, e.serverPosZ, morph);
+					ItemEntity newItem = new ItemEntity(e.getEntityWorld(), e.getPosX(), e.getPosY(), e.getPosZ(), morph);
 					e.getEntityWorld().addEntity(newItem);
 				}
 
@@ -72,7 +72,7 @@ public final class MorphingHandler {
 				copyCmp.remove("display");
 				String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName().getString()))
-					copy.setDisplayName(ITextComponent.Serializer.func_240643_a_(displayName));
+					copy.setDisplayName(ITextComponent.Serializer.getComponentFromJson(displayName));
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -154,7 +154,7 @@ public final class MorphingHandler {
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.putString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			ITextComponent stackName = ITextComponent.Serializer.func_240643_a_(displayName).func_240699_a_(TextFormatting.GREEN);
+			ITextComponent stackName = ITextComponent.Serializer.getComponentFromJson(displayName).mergeStyle(TextFormatting.GREEN);
 			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
 			stack.setDisplayName(comp);
 		}
