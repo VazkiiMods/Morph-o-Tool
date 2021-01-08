@@ -13,9 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -41,7 +40,7 @@ public final class MorphingHandler {
 
 		ItemEntity e = event.getEntityItem();
 		ItemStack stack = e.getItem();
-		removeItemFromTool(e, stack, false, (ItemStack copy) -> e.setItem(copy));
+		removeItemFromTool(e, stack, false, e::setItem);
 	}
 
 	@SubscribeEvent
@@ -50,7 +49,7 @@ public final class MorphingHandler {
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if(!stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
+		if(stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
@@ -73,7 +72,7 @@ public final class MorphingHandler {
 				copyCmp.remove("display");
 				String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName().getString()))
-					copy.setDisplayName(ITextComponent.Serializer.fromJson(displayName));
+					copy.setDisplayName(ITextComponent.Serializer.func_240643_a_(displayName));
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -89,7 +88,8 @@ public final class MorphingHandler {
 	}
 
 	public static String getModFromStack(ItemStack stack) {
-		return getModOrAlias(stack.isEmpty() ? MINECRAFT : stack.getItem().getCreatorModId(stack));
+		String modId = stack.getItem().getCreatorModId(stack);
+		return getModOrAlias(stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT);
 	}
 
 	public static String getModOrAlias(String mod) {
@@ -154,7 +154,7 @@ public final class MorphingHandler {
 				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.putString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			ITextComponent stackName = ITextComponent.Serializer.fromJson(displayName).setStyle(new Style().setColor(TextFormatting.GREEN));
+			ITextComponent stackName = ITextComponent.Serializer.func_240643_a_(displayName).func_240699_a_(TextFormatting.GREEN);
 			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
 			stack.setDisplayName(comp);
 		}
@@ -186,19 +186,19 @@ public final class MorphingHandler {
 	}
 
 	public static RayTraceResult raycast(Entity e, double len) {
-		Vec3d vec = new Vec3d(e.getPosX(), e.getPosY(), e.getPosZ());
+		Vector3d vec = new Vector3d(e.getPosX(), e.getPosY(), e.getPosZ());
 		if(e instanceof PlayerEntity)
-			vec = vec.add(new Vec3d(0, e.getEyeHeight(), 0));
+			vec = vec.add(new Vector3d(0, e.getEyeHeight(), 0));
 
-		Vec3d look = e.getLookVec();
+		Vector3d look = e.getLookVec();
 		if(look == null)
 			return null;
 
 		return raycast(e, vec, look, len);
 	}
 
-	public static RayTraceResult raycast(Entity e, Vec3d origin, Vec3d ray, double len) {
-		Vec3d end = origin.add(ray.normalize().scale(len));
+	public static RayTraceResult raycast(Entity e, Vector3d origin, Vector3d ray, double len) {
+		Vector3d end = origin.add(ray.normalize().scale(len));
 		return e.getEntityWorld().rayTraceBlocks(new RayTraceContext(origin, end, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, e));
 	}
 }
