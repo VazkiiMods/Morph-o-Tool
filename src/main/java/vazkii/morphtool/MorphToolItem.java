@@ -51,7 +51,7 @@ public class MorphToolItem extends BasicItem {
 					if(!stack.isEmpty()) {
 						String name = modStack.getDisplayName().getString();
 						if(modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
-							name = modStack.getTag().getString(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME);
+							name = ((CompoundNBT) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)).getString("text");
 						String mod = MorphingHandler.getModFromStack(modStack);
 
 						tooltip.add(new StringTextComponent(" " + mod + " : " + name));

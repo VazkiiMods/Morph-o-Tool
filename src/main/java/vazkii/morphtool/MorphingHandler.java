@@ -15,6 +15,8 @@ import net.minecraft.util.math.RayTraceContext;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -70,9 +72,12 @@ public final class MorphingHandler {
 				}
 
 				copyCmp.remove("display");
-				String displayName = copyCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
-				if(!displayName.isEmpty() && !displayName.equals(copy.getDisplayName().getString()))
-					copy.setDisplayName(ITextComponent.Serializer.getComponentFromJson(displayName));
+				ITextComponent displayName = null;
+				CompoundNBT nameCmp = (CompoundNBT) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
+				if (nameCmp != null)
+					displayName = new StringTextComponent(nameCmp.getString("text"));
+				if(displayName != null && !displayName.getString().isEmpty() && displayName != copy.getDisplayName())
+					copy.setDisplayName(displayName);
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -149,12 +154,13 @@ public final class MorphingHandler {
 		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
 		if(stack.getItem() != ModItems.tool) {
-			String displayName = ITextComponent.Serializer.toJson(stack.getDisplayName());
+			CompoundNBT displayName = new CompoundNBT();
+			displayName.putString("text", stack.getDisplayName().getString());
 			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
-				displayName = stackCmp.getString(TAG_MORPH_TOOL_DISPLAY_NAME);
-			else stackCmp.putString(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
+				displayName = (CompoundNBT) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
+			else stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			ITextComponent stackName = ITextComponent.Serializer.getComponentFromJson(displayName).mergeStyle(TextFormatting.GREEN);
+			ITextComponent stackName = new StringTextComponent(displayName.getString("text")).setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.GREEN));
 			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
 			stack.setDisplayName(comp);
 		}
