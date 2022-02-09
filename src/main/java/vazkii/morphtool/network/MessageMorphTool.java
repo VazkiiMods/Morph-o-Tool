@@ -1,18 +1,18 @@
 package vazkii.morphtool.network;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraftforge.network.NetworkEvent;
 import vazkii.arl.network.IMessage;
 import vazkii.morphtool.ConfigHandler;
 import vazkii.morphtool.MorphingHandler;
 
 public class MessageMorphTool implements IMessage {
 
-	private static final long serialVersionUID = 8883750897743016439L;
-	
-	public ItemStack stack;
+    private static final long serialVersionUID = 8883750897743016439L;
+    
+    public ItemStack stack;
     public int slot;
 
     public MessageMorphTool() {}
@@ -25,14 +25,15 @@ public class MessageMorphTool implements IMessage {
 
     @Override
     public boolean receive(NetworkEvent.Context context) {
-        PlayerEntity player = context.getSender();
+        Player player = context.getSender();
         if(player != null) {
-        	context.enqueueWork(() -> {
-        		ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            context.enqueueWork(() -> {
+            	ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
                 if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.isSame(stack, mainHandItem)) {
-                    player.inventory.setItem(ConfigHandler.invertHandShift.get() ? player.inventory.getContainerSize() - 1 : slot, stack);
+                    var inventory = player.getInventory();
+                    inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : slot, stack);
                 }
-        	});
+            });
         }
         return true;
     }

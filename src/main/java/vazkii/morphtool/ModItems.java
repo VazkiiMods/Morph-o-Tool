@@ -1,6 +1,6 @@
 package vazkii.morphtool;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public final class ModItems {
 

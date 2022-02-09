@@ -5,25 +5,25 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.RayTraceContext;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 public final class MorphingHandler {
 
@@ -52,10 +52,10 @@ public final class MorphingHandler {
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
 		if(stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
-			CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
+			CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
-			CompoundNBT newMorphData = morph.getTag().getCompound(TAG_MORPH_TOOL_DATA);
+			CompoundTag newMorphData = morph.getTag().getCompound(TAG_MORPH_TOOL_DATA);
 			newMorphData.remove(getModFromStack(stack));
 
 			if(!itemBroken) {
@@ -65,17 +65,17 @@ public final class MorphingHandler {
 				}
 
 				ItemStack copy = stack.copy();
-				CompoundNBT copyCmp = copy.getTag();
+				CompoundTag copyCmp = copy.getTag();
 				if(copyCmp == null) {
-					copyCmp = new CompoundNBT();
+					copyCmp = new CompoundTag();
 					copy.setTag(copyCmp);
 				}
 
 				copyCmp.remove("display");
-				ITextComponent displayName = null;
-				CompoundNBT nameCmp = (CompoundNBT) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
+				Component displayName = null;
+				CompoundTag nameCmp = (CompoundTag) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if (nameCmp != null)
-					displayName = new StringTextComponent(nameCmp.getString("text"));
+					displayName = new TextComponent(nameCmp.getString("text"));
 				if(displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName())
 					copy.setHoverName(displayName);
 
@@ -118,14 +118,14 @@ public final class MorphingHandler {
 		if(mod.equals(currentMod))
 			return stack;
 
-		CompoundNBT morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA);
+		CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA);
 		return makeMorphedStack(stack, mod, morphData);
 	}
 
-	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, CompoundNBT morphData) {
+	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, CompoundTag morphData) {
 		String currentMod = getModFromStack(currentStack);
 
-		CompoundNBT currentCmp = new CompoundNBT();
+		CompoundTag currentCmp = new CompoundTag();
 		currentStack.save(currentCmp);
 		currentCmp = currentCmp.copy();
 		if(currentCmp.contains("tag"))
@@ -138,7 +138,7 @@ public final class MorphingHandler {
 		if(targetMod.equals(MINECRAFT))
 			stack = new ItemStack(ModItems.tool);
 		else {
-			CompoundNBT targetCmp = morphData.getCompound(targetMod);
+			CompoundTag targetCmp = morphData.getCompound(targetMod);
 			morphData.remove(targetMod);
 
 			stack = ItemStack.of(targetCmp);
@@ -147,21 +147,21 @@ public final class MorphingHandler {
 		}
 
 		if(!stack.hasTag())
-			stack.setTag(new CompoundNBT());
+			stack.setTag(new CompoundTag());
 
-		CompoundNBT stackCmp = stack.getTag();
+		CompoundTag stackCmp = stack.getTag();
 		stackCmp.put(TAG_MORPH_TOOL_DATA, morphData);
 		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
 		if(stack.getItem() != ModItems.tool) {
-			CompoundNBT displayName = new CompoundNBT();
+			CompoundTag displayName = new CompoundTag();
 			displayName.putString("text", stack.getHoverName().getString());
 			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
-				displayName = (CompoundNBT) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
+				displayName = (CompoundTag) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			ITextComponent stackName = new StringTextComponent(displayName.getString("text")).setStyle(Style.EMPTY.applyFormats(TextFormatting.GREEN));
-			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
+			Component stackName = new TextComponent(displayName.getString("text")).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
+			Component comp = new TranslatableComponent("morphtool.sudo_name", stackName);
 			stack.setHoverName(comp);
 		}
 
@@ -172,7 +172,7 @@ public final class MorphingHandler {
 	private static final Map<String, String> modNames = new HashMap<String, String>();
 
 	static {
-		for(ModInfo modEntry : ModList.get().getMods())
+		for(IModInfo modEntry : ModList.get().getMods())
 			modNames.put(modEntry.getModId().toLowerCase(Locale.ENGLISH),  modEntry.getDisplayName());
 	}
 
@@ -191,20 +191,20 @@ public final class MorphingHandler {
 		return stack.hasTag() && stack.getTag().getBoolean(TAG_MORPHING_TOOL);
 	}
 
-	public static RayTraceResult raycast(Entity e, double len) {
-		Vector3d vec = new Vector3d(e.getX(), e.getY(), e.getZ());
-		if(e instanceof PlayerEntity)
-			vec = vec.add(new Vector3d(0, e.getEyeHeight(), 0));
+	public static HitResult raycast(Entity e, double len) {
+		Vec3 vec = new Vec3(e.getX(), e.getY(), e.getZ());
+		if(e instanceof Player)
+			vec = vec.add(new Vec3(0, e.getEyeHeight(), 0));
 
-		Vector3d look = e.getLookAngle();
+		Vec3 look = e.getLookAngle();
 		if(look == null)
 			return null;
 
 		return raycast(e, vec, look, len);
 	}
 
-	public static RayTraceResult raycast(Entity e, Vector3d origin, Vector3d ray, double len) {
-		Vector3d end = origin.add(ray.normalize().scale(len));
-		return e.getCommandSenderWorld().clip(new RayTraceContext(origin, end, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, e));
+	public static HitResult raycast(Entity e, Vec3 origin, Vec3 ray, double len) {
+		Vec3 end = origin.add(ray.normalize().scale(len));
+		return e.getCommandSenderWorld().clip(new ClipContext(origin, end, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, e));
 	}
 }

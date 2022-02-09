@@ -1,7 +1,7 @@
 package vazkii.morphtool.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
 import vazkii.morphtool.ClientHandler;
 import vazkii.morphtool.ConfigHandler;
@@ -16,7 +16,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void updateEquippedItem() {
-		Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+		Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 	}
 
 }
