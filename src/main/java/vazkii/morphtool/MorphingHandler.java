@@ -178,7 +178,7 @@ public final class MorphingHandler {
 
 	public static String getModNameForId(String modId) {
 		modId = modId.toLowerCase(Locale.ENGLISH);
-		return modNames.containsKey(modId) ? modNames.get(modId) : modId;
+		return modNames.getOrDefault(modId, modId);
 	}
 
 	public static boolean isMorphTool(ItemStack stack) {

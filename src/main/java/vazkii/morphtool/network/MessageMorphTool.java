@@ -8,14 +8,11 @@ import vazkii.arl.network.IMessage;
 import vazkii.morphtool.ConfigHandler;
 import vazkii.morphtool.MorphingHandler;
 
+@SuppressWarnings("serial")
 public class MessageMorphTool implements IMessage {
-
-    private static final long serialVersionUID = 8883750897743016439L;
     
-    public ItemStack stack;
-    public int slot;
-
-    public MessageMorphTool() {}
+    public final ItemStack stack;
+    public final int slot;
 
     public MessageMorphTool(ItemStack stack, int slot) {
         this.stack = stack;
