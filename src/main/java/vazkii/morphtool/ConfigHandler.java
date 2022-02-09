@@ -1,13 +1,13 @@
 package vazkii.morphtool;
 
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
-
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 
 import net.minecraftforge.common.ForgeConfigSpec;
+
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.List;
 
 public class ConfigHandler {
 
@@ -18,7 +18,7 @@ public class ConfigHandler {
 	static final ConfigHandler CONFIG;
 	static final ForgeConfigSpec CONFIG_SPEC;
 
-	static{
+	static {
 		final Pair<ConfigHandler, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ConfigHandler::new);
 		CONFIG = specPair.getLeft();
 		CONFIG_SPEC = specPair.getRight();
@@ -36,25 +36,28 @@ public class ConfigHandler {
 						"environmentaltech:tool_multiblock_assembler",
 						"bloodmagic:ritual_reader",
 						"draconicevolution:crystal_binder",
-						"crossroads:omnimeter"), Predicates.alwaysTrue());
+						"crossroads:omnimeter"),
+				Predicates.alwaysTrue());
 
 		whitelistedNames = builder.defineList("Whitelisted Names",
-				Lists.newArrayList("wrench", 
-						"screwdriver", 
-						"hammer", 
-						"rotator", 
-						"configurator", 
-						"crowbar"), Predicates.alwaysTrue());
+				Lists.newArrayList("wrench",
+						"screwdriver",
+						"hammer",
+						"rotator",
+						"configurator",
+						"crowbar"),
+				Predicates.alwaysTrue());
 
 		blacklistedMods = builder.defineList("Blacklisted Mods",
-				Lists.newArrayList("tconstruct", 
-						"intangible"), Predicates.alwaysTrue());
+				Lists.newArrayList("tconstruct",
+						"intangible"),
+				Predicates.alwaysTrue());
 
 		aliasesList = builder.defineList("Mod Aliases",
 				Lists.newArrayList("nautralpledge=botania",
 						"thermalexpansion=thermalfoundation",
 						"thermaldynamics=thermalfoundation",
-						"thermalcultivation=thermalfoundation", 
+						"thermalcultivation=thermalfoundation",
 						"redstonearsenal=thermalfoundation",
 						"rftoolsdim=rftools",
 						"rftoolspower=rftools",
@@ -68,7 +71,8 @@ public class ConfigHandler {
 						"xnet=rftools",
 						"buildcrafttransport=buildcraft",
 						"buildcraftfactory=buildcraft",
-						"buildcraftsilicon=buildcraft"), Predicates.alwaysTrue());
+						"buildcraftsilicon=buildcraft"),
+				Predicates.alwaysTrue());
 
 	}
 

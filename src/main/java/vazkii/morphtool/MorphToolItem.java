@@ -1,25 +1,25 @@
 package vazkii.morphtool;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
+
 import vazkii.arl.item.BasicItem;
 import vazkii.arl.util.TooltipHandler;
 
-import net.minecraft.world.item.Item.Properties;
+import javax.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MorphToolItem extends BasicItem {
 
@@ -36,23 +36,23 @@ public class MorphToolItem extends BasicItem {
 
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag advanced) {
-		if(!stack.hasTag() || !stack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DATA))
+		if (!stack.hasTag() || !stack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DATA))
 			return;
 
 		CompoundTag data = stack.getTag().getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
-		if(data.getAllKeys().size() == 0)
+		if (data.getAllKeys().size() == 0)
 			return;
 
 		List<String> tooltipList = new ArrayList<>();
 
 		TooltipHandler.tooltipIfShift(tooltipList, () -> {
-			for(String s : data.getAllKeys()) {
+			for (String s : data.getAllKeys()) {
 				CompoundTag cmp = data.getCompound(s);
-				if(cmp != null) {
+				if (cmp != null) {
 					ItemStack modStack = ItemStack.of(cmp);
-					if(!stack.isEmpty()) {
+					if (!stack.isEmpty()) {
 						String name = modStack.getHoverName().getString();
-						if(modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
+						if (modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
 							name = ((CompoundTag) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)).getString("text");
 						String mod = MorphingHandler.getModFromStack(modStack);
 

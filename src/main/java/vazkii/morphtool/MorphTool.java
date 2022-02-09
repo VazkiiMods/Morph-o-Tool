@@ -7,6 +7,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkDirection;
+
 import vazkii.arl.network.NetworkHandler;
 import vazkii.morphtool.network.MessageMorphTool;
 import vazkii.morphtool.proxy.ClientProxy;
@@ -19,13 +20,13 @@ public class MorphTool {
 	public static NetworkHandler NETWORKHANDLER;
 	public static CommonProxy proxy;
 
-	public MorphTool(){
+	public MorphTool() {
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
 		ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.CONFIG_SPEC);
 
 		proxy = DistExecutor.runForDist(() -> ClientProxy::new, () -> CommonProxy::new);
 		proxy.preInit();
-		
+
 		ModItems.init();
 
 		NETWORKHANDLER = new NetworkHandler(MOD_ID, 1);

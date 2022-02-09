@@ -3,6 +3,7 @@ package vazkii.morphtool.proxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
+
 import vazkii.morphtool.ClientHandler;
 import vazkii.morphtool.ConfigHandler;
 

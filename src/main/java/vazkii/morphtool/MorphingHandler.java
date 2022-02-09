@@ -1,10 +1,5 @@
 package vazkii.morphtool;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -25,6 +20,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
+
 public final class MorphingHandler {
 
 	public static final MorphingHandler INSTANCE = new MorphingHandler();
@@ -37,7 +37,7 @@ public final class MorphingHandler {
 
 	@SubscribeEvent
 	public void onItemDropped(ItemTossEvent event) {
-		if(!event.getPlayer().isCrouching())
+		if (!event.getPlayer().isCrouching())
 			return;
 
 		ItemEntity e = event.getEntityItem();
@@ -51,22 +51,22 @@ public final class MorphingHandler {
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if(stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
+		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
 			CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
 			CompoundTag newMorphData = morph.getTag().getCompound(TAG_MORPH_TOOL_DATA);
 			newMorphData.remove(getModFromStack(stack));
 
-			if(!itemBroken) {
-				if(!e.getCommandSenderWorld().isClientSide) {
+			if (!itemBroken) {
+				if (!e.getCommandSenderWorld().isClientSide) {
 					ItemEntity newItem = new ItemEntity(e.getCommandSenderWorld(), e.getX(), e.getY(), e.getZ(), morph);
 					e.getCommandSenderWorld().addFreshEntity(newItem);
 				}
 
 				ItemStack copy = stack.copy();
 				CompoundTag copyCmp = copy.getTag();
-				if(copyCmp == null) {
+				if (copyCmp == null) {
 					copyCmp = new CompoundTag();
 					copy.setTag(copyCmp);
 				}
@@ -76,7 +76,7 @@ public final class MorphingHandler {
 				CompoundTag nameCmp = (CompoundTag) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if (nameCmp != null)
 					displayName = new TextComponent(nameCmp.getString("text"));
-				if(displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName())
+				if (displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName())
 					copy.setHoverName(displayName);
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
@@ -84,7 +84,8 @@ public final class MorphingHandler {
 				copyCmp.remove(TAG_MORPH_TOOL_DATA);
 
 				consumer.accept(copy);
-			} else consumer.accept(morph);
+			} else
+				consumer.accept(morph);
 		}
 	}
 
@@ -101,8 +102,8 @@ public final class MorphingHandler {
 
 		Map<String, String> aliases = new HashMap<>();
 
-		for(String s : ConfigHandler.aliasesList.get())
-			if(s.matches(".+?=.+")) {
+		for (String s : ConfigHandler.aliasesList.get())
+			if (s.matches(".+?=.+")) {
 				String[] tokens = s.toLowerCase().split("=");
 				aliases.put(tokens[0], tokens[1]);
 			}
@@ -111,11 +112,11 @@ public final class MorphingHandler {
 	}
 
 	public static ItemStack getShiftStackForMod(ItemStack stack, String mod) {
-		if(!stack.hasTag())
+		if (!stack.hasTag())
 			return stack;
 
 		String currentMod = getModFromStack(stack);
-		if(mod.equals(currentMod))
+		if (mod.equals(currentMod))
 			return stack;
 
 		CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA);
@@ -128,37 +129,38 @@ public final class MorphingHandler {
 		CompoundTag currentCmp = new CompoundTag();
 		currentStack.save(currentCmp);
 		currentCmp = currentCmp.copy();
-		if(currentCmp.contains("tag"))
+		if (currentCmp.contains("tag"))
 			currentCmp.getCompound("tag").remove(TAG_MORPH_TOOL_DATA);
 
-		if(!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID))
+		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID))
 			morphData.put(currentMod, currentCmp);
 
 		ItemStack stack;
-		if(targetMod.equals(MINECRAFT))
+		if (targetMod.equals(MINECRAFT))
 			stack = new ItemStack(ModItems.tool);
 		else {
 			CompoundTag targetCmp = morphData.getCompound(targetMod);
 			morphData.remove(targetMod);
 
 			stack = ItemStack.of(targetCmp);
-			if(stack.isEmpty())
+			if (stack.isEmpty())
 				stack = new ItemStack(ModItems.tool);
 		}
 
-		if(!stack.hasTag())
+		if (!stack.hasTag())
 			stack.setTag(new CompoundTag());
 
 		CompoundTag stackCmp = stack.getTag();
 		stackCmp.put(TAG_MORPH_TOOL_DATA, morphData);
 		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
-		if(stack.getItem() != ModItems.tool) {
+		if (stack.getItem() != ModItems.tool) {
 			CompoundTag displayName = new CompoundTag();
 			displayName.putString("text", stack.getHoverName().getString());
-			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
+			if (stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
 				displayName = (CompoundTag) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
-			else stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
+			else
+				stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
 			Component stackName = new TextComponent(displayName.getString("text")).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = new TranslatableComponent("morphtool.sudo_name", stackName);
@@ -169,11 +171,11 @@ public final class MorphingHandler {
 		return stack;
 	}
 
-	private static final Map<String, String> modNames = new HashMap<String, String>();
+	private static final Map<String, String> modNames = new HashMap<>();
 
 	static {
-		for(IModInfo modEntry : ModList.get().getMods())
-			modNames.put(modEntry.getModId().toLowerCase(Locale.ENGLISH),  modEntry.getDisplayName());
+		for (IModInfo modEntry : ModList.get().getMods())
+			modNames.put(modEntry.getModId().toLowerCase(Locale.ENGLISH), modEntry.getDisplayName());
 	}
 
 	public static String getModNameForId(String modId) {
@@ -182,10 +184,10 @@ public final class MorphingHandler {
 	}
 
 	public static boolean isMorphTool(ItemStack stack) {
-		if(stack.isEmpty())
+		if (stack.isEmpty())
 			return false;
 
-		if(stack.getItem() == ModItems.tool)
+		if (stack.getItem() == ModItems.tool)
 			return true;
 
 		return stack.hasTag() && stack.getTag().getBoolean(TAG_MORPHING_TOOL);
@@ -193,11 +195,11 @@ public final class MorphingHandler {
 
 	public static HitResult raycast(Entity e, double len) {
 		Vec3 vec = new Vec3(e.getX(), e.getY(), e.getZ());
-		if(e instanceof Player)
+		if (e instanceof Player)
 			vec = vec.add(new Vec3(0, e.getEyeHeight(), 0));
 
 		Vec3 look = e.getLookAngle();
-		if(look == null)
+		if (look == null)
 			return null;
 
 		return raycast(e, vec, look, len);

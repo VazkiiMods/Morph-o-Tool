@@ -9,9 +9,13 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
+plugins {
+    id 'com.diffplug.spotless' version '5.12.5'
+}
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: 'pmd'
 
 ext.configFile = file('build.properties')
 ext.config = parseConfig(configFile)
@@ -89,6 +93,30 @@ dependencies {
     implementation fg.deobf("vazkii.autoreglib:AutoRegLib:${config.arl_version}")
 }
 
+spotless {
+    enforceCheck = false // workaround around jenkins having wrong line endings in some files
+    java {
+        target project.fileTree(dir: 'src/main/java/vazkii/morphtool', include: '**/*.java')
+        //indentWithTabs()
+        eclipse().configFile 'spotless/eclipseformat.xml'
+        removeUnusedImports()
+        importOrderFile 'spotless/eclipse.importorder'
+        replaceRegex 'Not enough space after if', '(if|for|while|switch)\\(', '$1 ('
+    }
+}
+
+pmd {
+    toolVersion '6.22.0'
+    // no way around this warning unless we upgrade Gradle, apparently
+    //incrementalAnalysis.set(true)
+    ruleSets.clear()
+    ruleSetFiles = files("spotless/pmd-ruleset.xml")
+}
+
+task checkSyntax (group: "verification") {
+    dependsOn spotlessJavaCheck, pmdMain
+}
+
 processResources {
     // replace stuff in mcmod.info, nothing else
     filesMatching('META-INF/mods.toml') {
@@ -156,4 +184,4 @@ jar {
     exclude "**/unused"
 }
 
-defaultTasks 'clean', 'build', 'sortArtifacts', 'incrementBuildNumber'
+defaultTasks 'clean', 'checkSyntax', 'build', 'sortArtifacts', 'incrementBuildNumber'
