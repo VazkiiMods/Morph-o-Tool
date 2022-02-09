@@ -32,22 +32,22 @@ public class ClientHandler {
     public void onTick(ClientTickEvent event) {
         PlayerEntity player = Minecraft.getInstance().player;
         if(player != null && event.phase == Phase.END && autoMode) {
-            ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             if (MorphingHandler.isMorphTool(mainHandItem)) {
                 ItemStack newStack = mainHandItem;
                 RayTraceResult res = MorphingHandler.raycast(player, 4.5);
 
                 //Get looked at Mod
                 if (res != null && res.getType() == RayTraceResult.Type.BLOCK) {
-                    BlockState state = player.world.getBlockState(((BlockRayTraceResult) res).getPos());
+                    BlockState state = player.level.getBlockState(((BlockRayTraceResult) res).getBlockPos());
                     String modlook = MorphingHandler.getModFromState(state);
                     //Morph tool to looked at Mod
                     newStack = MorphingHandler.getShiftStackForMod(mainHandItem, modlook);
                 }
 
-                if (newStack != mainHandItem && !ItemStack.areItemsEqual(newStack, mainHandItem)) {
-                    player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : player.inventory.currentItem, newStack);
-                    MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, player.inventory.currentItem));
+                if (newStack != mainHandItem && !ItemStack.isSame(newStack, mainHandItem)) {
+                    player.inventory.setItem(ConfigHandler.invertHandShift.get() ? player.inventory.getContainerSize() - 1 : player.inventory.selected, newStack);
+                    MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, player.inventory.selected));
                     MorphTool.proxy.updateEquippedItem();
                 }
             }
@@ -58,7 +58,7 @@ public class ClientHandler {
     public void onMouseEvent(InputEvent.MouseScrollEvent event) {
         PlayerEntity player = Minecraft.getInstance().player;
         if(player != null) {
-            ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+            ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
             if (MorphingHandler.isMorphTool(mainHandItem)) {
                 ItemStack newStack = mainHandItem;
                 String mod = MorphingHandler.getModFromStack(mainHandItem);
@@ -67,7 +67,7 @@ public class ClientHandler {
 
                 //Get looked at Mod
                 if (res != null && res.getType() == RayTraceResult.Type.BLOCK) {
-                    BlockState state = player.world.getBlockState(((BlockRayTraceResult) res).getPos());
+                    BlockState state = player.level.getBlockState(((BlockRayTraceResult) res).getBlockPos());
                     modlook = MorphingHandler.getModFromState(state);
                 }
 
@@ -82,9 +82,9 @@ public class ClientHandler {
                     }
                 }
 
-                if (newStack != mainHandItem && !ItemStack.areItemsEqual(newStack, mainHandItem)) {
-                    player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : player.inventory.currentItem, newStack);
-                    MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, player.inventory.currentItem));
+                if (newStack != mainHandItem && !ItemStack.isSame(newStack, mainHandItem)) {
+                    player.inventory.setItem(ConfigHandler.invertHandShift.get() ? player.inventory.getContainerSize() - 1 : player.inventory.selected, newStack);
+                    MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, player.inventory.selected));
                     MorphTool.proxy.updateEquippedItem();
                 }
             }
@@ -93,7 +93,7 @@ public class ClientHandler {
 
 
     public static String nextMod(CompoundNBT morphData, String mod) {
-        List<String> mods = new ArrayList<>(morphData.keySet());
+        List<String> mods = new ArrayList<>(morphData.getAllKeys());
         mods.add("morphtool");
         if (!mod.equals("morphtool")){
             mods.add(mod);
@@ -109,7 +109,7 @@ public class ClientHandler {
     }
 
     public static String previousMod(CompoundNBT morphData, String mod) {
-        List<String> mods = new ArrayList<>(morphData.keySet());
+        List<String> mods = new ArrayList<>(morphData.getAllKeys());
         mods.add("morphtool");
         if (!mod.equals("morphtool")){
             mods.add(mod);

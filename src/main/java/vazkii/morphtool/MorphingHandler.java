@@ -47,7 +47,7 @@ public final class MorphingHandler {
 
 	@SubscribeEvent
 	public void onItemBroken(PlayerDestroyItemEvent event) {
-		removeItemFromTool(event.getPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getPlayer().setHeldItem(event.getHand(), morph));
+		removeItemFromTool(event.getPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getPlayer().setItemInHand(event.getHand(), morph));
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
@@ -59,9 +59,9 @@ public final class MorphingHandler {
 			newMorphData.remove(getModFromStack(stack));
 
 			if(!itemBroken) {
-				if(!e.getEntityWorld().isRemote) {
-					ItemEntity newItem = new ItemEntity(e.getEntityWorld(), e.getPosX(), e.getPosY(), e.getPosZ(), morph);
-					e.getEntityWorld().addEntity(newItem);
+				if(!e.getCommandSenderWorld().isClientSide) {
+					ItemEntity newItem = new ItemEntity(e.getCommandSenderWorld(), e.getX(), e.getY(), e.getZ(), morph);
+					e.getCommandSenderWorld().addFreshEntity(newItem);
 				}
 
 				ItemStack copy = stack.copy();
@@ -76,8 +76,8 @@ public final class MorphingHandler {
 				CompoundNBT nameCmp = (CompoundNBT) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if (nameCmp != null)
 					displayName = new StringTextComponent(nameCmp.getString("text"));
-				if(displayName != null && !displayName.getString().isEmpty() && displayName != copy.getDisplayName())
-					copy.setDisplayName(displayName);
+				if(displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName())
+					copy.setHoverName(displayName);
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
@@ -126,7 +126,7 @@ public final class MorphingHandler {
 		String currentMod = getModFromStack(currentStack);
 
 		CompoundNBT currentCmp = new CompoundNBT();
-		currentStack.write(currentCmp);
+		currentStack.save(currentCmp);
 		currentCmp = currentCmp.copy();
 		if(currentCmp.contains("tag"))
 			currentCmp.getCompound("tag").remove(TAG_MORPH_TOOL_DATA);
@@ -141,7 +141,7 @@ public final class MorphingHandler {
 			CompoundNBT targetCmp = morphData.getCompound(targetMod);
 			morphData.remove(targetMod);
 
-			stack = ItemStack.read(targetCmp);
+			stack = ItemStack.of(targetCmp);
 			if(stack.isEmpty())
 				stack = new ItemStack(ModItems.tool);
 		}
@@ -155,14 +155,14 @@ public final class MorphingHandler {
 
 		if(stack.getItem() != ModItems.tool) {
 			CompoundNBT displayName = new CompoundNBT();
-			displayName.putString("text", stack.getDisplayName().getString());
+			displayName.putString("text", stack.getHoverName().getString());
 			if(stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME))
 				displayName = (CompoundNBT) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 			else stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 
-			ITextComponent stackName = new StringTextComponent(displayName.getString("text")).setStyle(Style.EMPTY.createStyleFromFormattings(TextFormatting.GREEN));
+			ITextComponent stackName = new StringTextComponent(displayName.getString("text")).setStyle(Style.EMPTY.applyFormats(TextFormatting.GREEN));
 			ITextComponent comp = new TranslationTextComponent("morphtool.sudo_name", stackName);
-			stack.setDisplayName(comp);
+			stack.setHoverName(comp);
 		}
 
 		stack.setCount(1);
@@ -192,11 +192,11 @@ public final class MorphingHandler {
 	}
 
 	public static RayTraceResult raycast(Entity e, double len) {
-		Vector3d vec = new Vector3d(e.getPosX(), e.getPosY(), e.getPosZ());
+		Vector3d vec = new Vector3d(e.getX(), e.getY(), e.getZ());
 		if(e instanceof PlayerEntity)
 			vec = vec.add(new Vector3d(0, e.getEyeHeight(), 0));
 
-		Vector3d look = e.getLookVec();
+		Vector3d look = e.getLookAngle();
 		if(look == null)
 			return null;
 
@@ -205,6 +205,6 @@ public final class MorphingHandler {
 
 	public static RayTraceResult raycast(Entity e, Vector3d origin, Vector3d ray, double len) {
 		Vector3d end = origin.add(ray.normalize().scale(len));
-		return e.getEntityWorld().rayTraceBlocks(new RayTraceContext(origin, end, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, e));
+		return e.getCommandSenderWorld().clip(new RayTraceContext(origin, end, RayTraceContext.BlockMode.OUTLINE, RayTraceContext.FluidMode.NONE, e));
 	}
 }

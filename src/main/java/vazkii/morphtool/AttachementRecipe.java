@@ -20,8 +20,8 @@ public class AttachementRecipe extends SpecialRecipe {
 		boolean foundTool = false;
 		boolean foundTarget = false;
 
-		for(int i = 0; i < var1.getSizeInventory(); i++) {
-			ItemStack stack = var1.getStackInSlot(i);
+		for(int i = 0; i < var1.getContainerSize(); i++) {
+			ItemStack stack = var1.getItem(i);
 			if(!stack.isEmpty()) {
 				if(isTarget(stack)) {
 					if(foundTarget)
@@ -39,12 +39,12 @@ public class AttachementRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public ItemStack getCraftingResult(CraftingInventory var1) {
+	public ItemStack assemble(CraftingInventory var1) {
 		ItemStack tool = ItemStack.EMPTY;
 		ItemStack target = ItemStack.EMPTY;
 
-		for(int i = 0; i < var1.getSizeInventory(); i++) {
-			ItemStack stack = var1.getStackInSlot(i);
+		for(int i = 0; i < var1.getContainerSize(); i++) {
+			ItemStack stack = var1.getItem(i);
 			if(!stack.isEmpty()) {
 				if(stack.getItem() == ModItems.tool)
 					tool = stack;
@@ -69,14 +69,14 @@ public class AttachementRecipe extends SpecialRecipe {
 			return ItemStack.EMPTY;
 
 		CompoundNBT modCmp = new CompoundNBT();
-		target.write(modCmp);
+		target.save(modCmp);
 		morphData.put(mod, modCmp);
 
 		return copy;
 	}
 
 	@Override
-	public boolean canFit(int width, int height) {
+	public boolean canCraftInDimensions(int width, int height) {
 		return width * height >= 2;
 	}
 
@@ -96,7 +96,7 @@ public class AttachementRecipe extends SpecialRecipe {
 
 		ResourceLocation registryNameRL = stack.getItem().getRegistryName();
 		String registryName = registryNameRL.toString();
-		if(ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamage()))
+		if(ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue()))
 			return true;
 
 		String itemName = registryNameRL.getPath().toLowerCase();
@@ -108,13 +108,13 @@ public class AttachementRecipe extends SpecialRecipe {
 	}
 
 	@Override
-	public ItemStack getRecipeOutput() {
+	public ItemStack getResultItem() {
 		return ItemStack.EMPTY;
 	}
 
 	@Override
 	public NonNullList<ItemStack> getRemainingItems(CraftingInventory inv) {
-		return NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+		return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 	}
 
 	@Override

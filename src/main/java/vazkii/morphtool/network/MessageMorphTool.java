@@ -28,9 +28,9 @@ public class MessageMorphTool implements IMessage {
         PlayerEntity player = context.getSender();
         if(player != null) {
         	context.enqueueWork(() -> {
-        		ItemStack mainHandItem = player.getHeldItem(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
-                if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.areItemsEqual(stack, mainHandItem)) {
-                    player.inventory.setInventorySlotContents(ConfigHandler.invertHandShift.get() ? player.inventory.getSizeInventory() - 1 : slot, stack);
+        		ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+                if (MorphingHandler.isMorphTool(mainHandItem) && stack != mainHandItem && !ItemStack.isSame(stack, mainHandItem)) {
+                    player.inventory.setItem(ConfigHandler.invertHandShift.get() ? player.inventory.getContainerSize() - 1 : slot, stack);
                 }
         	});
         }

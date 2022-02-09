@@ -16,7 +16,7 @@ public class ClientProxy extends CommonProxy {
 
 	@Override
 	public void updateEquippedItem() {
-		Minecraft.getInstance().gameRenderer.itemRenderer.resetEquippedProgress(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
+		Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(ConfigHandler.invertHandShift.get() ? Hand.OFF_HAND : Hand.MAIN_HAND);
 	}
 
 }
