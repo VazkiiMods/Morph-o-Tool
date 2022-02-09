@@ -16,7 +16,7 @@
     <rule ref="category/java/bestpractices.xml/SystemPrintln" />
     <rule ref="category/java/bestpractices.xml/UseTryWithResources" />
 
-    <!--rule ref="category/java/codestyle.xml/ControlStatementBraces" /-->
+    <rule ref="category/java/codestyle.xml/ControlStatementBraces" />
     <rule ref="category/java/codestyle.xml/UnnecessaryModifier" />
     <rule ref="category/java/codestyle.xml/UseDiamondOperator" />
 

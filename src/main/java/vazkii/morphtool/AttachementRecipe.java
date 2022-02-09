@@ -24,15 +24,18 @@ public class AttachementRecipe extends CustomRecipe {
 			ItemStack stack = var1.getItem(i);
 			if (!stack.isEmpty()) {
 				if (isTarget(stack)) {
-					if (foundTarget)
+					if (foundTarget) {
 						return false;
+					}
 					foundTarget = true;
 				} else if (stack.getItem() == ModItems.tool) {
-					if (foundTool)
+					if (foundTool) {
 						return false;
+					}
 					foundTool = true;
-				} else
+				} else {
 					return false;
+				}
 			}
 		}
 
@@ -47,10 +50,11 @@ public class AttachementRecipe extends CustomRecipe {
 		for (int i = 0; i < var1.getContainerSize(); i++) {
 			ItemStack stack = var1.getItem(i);
 			if (!stack.isEmpty()) {
-				if (stack.getItem() == ModItems.tool)
+				if (stack.getItem() == ModItems.tool) {
 					tool = stack;
-				else
+				} else {
 					target = stack;
+				}
 			}
 		}
 
@@ -61,14 +65,16 @@ public class AttachementRecipe extends CustomRecipe {
 			copy.setTag(cmp);
 		}
 
-		if (!cmp.contains(MorphingHandler.TAG_MORPH_TOOL_DATA))
+		if (!cmp.contains(MorphingHandler.TAG_MORPH_TOOL_DATA)) {
 			cmp.put(MorphingHandler.TAG_MORPH_TOOL_DATA, new CompoundTag());
+		}
 
 		CompoundTag morphData = cmp.getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
 		String mod = MorphingHandler.getModFromStack(target);
 
-		if (morphData.contains(mod))
+		if (morphData.contains(mod)) {
 			return ItemStack.EMPTY;
+		}
 
 		CompoundTag modCmp = new CompoundTag();
 		target.save(modCmp);
@@ -83,28 +89,35 @@ public class AttachementRecipe extends CustomRecipe {
 	}
 
 	public boolean isTarget(ItemStack stack) {
-		if (stack.isEmpty() || MorphingHandler.isMorphTool(stack))
+		if (stack.isEmpty() || MorphingHandler.isMorphTool(stack)) {
 			return false;
+		}
 
 		String mod = MorphingHandler.getModFromStack(stack);
-		if (mod.equals(MorphingHandler.MINECRAFT))
+		if (mod.equals(MorphingHandler.MINECRAFT)) {
 			return false;
+		}
 
-		if (ConfigHandler.allItems.get())
+		if (ConfigHandler.allItems.get()) {
 			return true;
+		}
 
-		if (ConfigHandler.blacklistedMods.get().contains(mod))
+		if (ConfigHandler.blacklistedMods.get().contains(mod)) {
 			return false;
+		}
 
 		ResourceLocation registryNameRL = stack.getItem().getRegistryName();
 		String registryName = registryNameRL.toString();
-		if (ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue()))
+		if (ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue())) {
 			return true;
+		}
 
 		String itemName = registryNameRL.getPath().toLowerCase();
-		for (String s : ConfigHandler.whitelistedNames.get())
-			if (itemName.contains(s.toLowerCase()))
+		for (String s : ConfigHandler.whitelistedNames.get()) {
+			if (itemName.contains(s.toLowerCase())) {
 				return true;
+			}
+		}
 
 		return false;
 	}

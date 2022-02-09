@@ -36,12 +36,14 @@ public class MorphToolItem extends BasicItem {
 
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag advanced) {
-		if (!stack.hasTag() || !stack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DATA))
+		if (!stack.hasTag() || !stack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DATA)) {
 			return;
+		}
 
 		CompoundTag data = stack.getTag().getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
-		if (data.getAllKeys().size() == 0)
+		if (data.getAllKeys().size() == 0) {
 			return;
+		}
 
 		List<String> tooltipList = new ArrayList<>();
 
@@ -52,16 +54,16 @@ public class MorphToolItem extends BasicItem {
 					ItemStack modStack = ItemStack.of(cmp);
 					if (!stack.isEmpty()) {
 						String name = modStack.getHoverName().getString();
-						if (modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME))
+						if (modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)) {
 							name = ((CompoundTag) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)).getString("text");
+						}
 						String mod = MorphingHandler.getModFromStack(modStack);
 
 						tooltip.add(new TextComponent(" " + mod + " : " + name));
 					}
 				}
 			}
-		}
-		);
+		});
 
 		tooltipList.forEach(tip -> tooltip.add(new TextComponent(tip)));
 	}
