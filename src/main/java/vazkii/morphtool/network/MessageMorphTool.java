@@ -12,8 +12,11 @@ import vazkii.morphtool.MorphingHandler;
 @SuppressWarnings("serial")
 public class MessageMorphTool implements IMessage {
 
-	public final ItemStack stack;
-	public final int slot;
+	// non-final due to ARL doing serde funkily
+	public ItemStack stack;
+	public int slot;
+
+	public MessageMorphTool() {}
 
 	public MessageMorphTool(ItemStack stack, int slot) {
 		this.stack = stack;
