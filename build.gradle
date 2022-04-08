@@ -117,15 +117,6 @@ task checkSyntax (group: "verification") {
     dependsOn spotlessJavaCheck, pmdMain
 }
 
-processResources {
-    // replace stuff in mcmod.info, nothing else
-    filesMatching('META-INF/mods.toml') {
-
-        // replace version and mcversion
-        expand 'version': project.version
-    }
-}
-
 task incrementBuildNumber {
     doFirst {
         config.build_number = (config.build_number.toString().toInteger()) + 1
@@ -184,4 +175,4 @@ jar {
     exclude "**/unused"
 }
 
-defaultTasks 'clean', 'checkSyntax', 'build', 'sortArtifacts', 'incrementBuildNumber'
+defaultTasks 'clean', 'build', 'sortArtifacts', 'incrementBuildNumber'
