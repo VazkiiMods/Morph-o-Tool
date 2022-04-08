@@ -6,7 +6,7 @@ license="Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported Lice
 [[mods]]
 modId="morphtool"
 displayName="Morph-o-Tool"
-version="${version}"
+version="${file.jarVersion}"
 authors="Vazkii, MoreThanHidden"
 description='''
 The wrench to end all wrenches.
