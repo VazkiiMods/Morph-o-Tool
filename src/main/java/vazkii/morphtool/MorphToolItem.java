@@ -55,7 +55,10 @@ public class MorphToolItem extends BasicItem {
 					if (!stack.isEmpty()) {
 						String name = modStack.getHoverName().getString();
 						if (modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)) {
-							name = ((CompoundTag) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)).getString("text");
+							CompoundTag rawName = ((CompoundTag) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME));
+							Component nameComp = Component.Serializer.fromJson(rawName.getString("text"));
+							if(nameComp != null)
+								name = nameComp.getString();
 						}
 						String mod = MorphingHandler.getModFromStack(modStack);
 

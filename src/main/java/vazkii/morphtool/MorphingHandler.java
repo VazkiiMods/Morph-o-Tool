@@ -1,8 +1,14 @@
 package vazkii.morphtool;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.network.chat.TranslatableComponent;
@@ -19,11 +25,6 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
-
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
 
 public final class MorphingHandler {
 
@@ -167,14 +168,22 @@ public final class MorphingHandler {
 
 		if (stack.getItem() != ModItems.tool) {
 			CompoundTag displayName = new CompoundTag();
-			displayName.putString("text", stack.getHoverName().getString());
+			CompoundTag ogDisplayName = displayName;
+			displayName.putString("text",  Component.Serializer.toJson(stack.getHoverName()));
+			
 			if (stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME)) {
 				displayName = (CompoundTag) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 			} else {
 				stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
 			}
 
-			Component stackName = new TextComponent(displayName.getString("text")).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
+			MutableComponent rawComp = Component.Serializer.fromJson(displayName.getString("text"));
+			if(rawComp == null) {
+				stackCmp.put(TAG_MORPH_TOOL_DISPLAY_NAME, displayName);
+				displayName = ogDisplayName;
+			}
+			
+			Component stackName = rawComp.setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = new TranslatableComponent("morphtool.sudo_name", stackName);
 			stack.setHoverName(comp);
 		}
