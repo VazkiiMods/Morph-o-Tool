@@ -56,7 +56,7 @@ public class ClientHandler {
 	}
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
-	public void onMouseEvent(InputEvent.MouseScrollEvent event) {
+	public void onMouseEvent(InputEvent.MouseScrollingEvent event) {
 		Player player = Minecraft.getInstance().player;
 		if (player != null) {
 			ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);

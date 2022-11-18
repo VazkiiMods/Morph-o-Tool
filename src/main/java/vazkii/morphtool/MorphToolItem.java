@@ -2,7 +2,6 @@ package vazkii.morphtool;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item.Properties;
@@ -62,13 +61,13 @@ public class MorphToolItem extends BasicItem {
 						}
 						String mod = MorphingHandler.getModFromStack(modStack);
 
-						tooltip.add(new TextComponent(" " + mod + " : " + name));
+						tooltip.add(Component.literal(" " + mod + " : " + name));
 					}
 				}
 			}
 		});
 
-		tooltipList.forEach(tip -> tooltip.add(new TextComponent(tip)));
+		tooltipList.forEach(tip -> tooltip.add(Component.literal(tip)));
 	}
 
 }

@@ -10,8 +10,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,6 +23,7 @@ import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public final class MorphingHandler {
 
@@ -42,14 +41,14 @@ public final class MorphingHandler {
 			return;
 		}
 
-		ItemEntity e = event.getEntityItem();
+		ItemEntity e = event.getEntity();
 		ItemStack stack = e.getItem();
 		removeItemFromTool(e, stack, false, e::setItem);
 	}
 
 	@SubscribeEvent
 	public void onItemBroken(PlayerDestroyItemEvent event) {
-		removeItemFromTool(event.getPlayer(), event.getOriginal(), true, (ItemStack morph) -> event.getPlayer().setItemInHand(event.getHand(), morph));
+		removeItemFromTool(event.getEntity(), event.getOriginal(), true, (ItemStack morph) -> event.getEntity().setItemInHand(event.getHand(), morph));
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
@@ -77,7 +76,7 @@ public final class MorphingHandler {
 				Component displayName = null;
 				CompoundTag nameCmp = (CompoundTag) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 				if (nameCmp != null) {
-					displayName = new TextComponent(nameCmp.getString("text"));
+					displayName = Component.literal(nameCmp.getString("text"));
 				}
 				if (displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName()) {
 					copy.setHoverName(displayName);
@@ -95,7 +94,7 @@ public final class MorphingHandler {
 	}
 
 	public static String getModFromState(BlockState state) {
-		return getModOrAlias(state.getBlock().getRegistryName().getNamespace());
+		return getModOrAlias(ForgeRegistries.BLOCKS.getKey(state.getBlock()).getNamespace());
 	}
 
 	public static String getModFromStack(ItemStack stack) {
@@ -184,7 +183,7 @@ public final class MorphingHandler {
 			}
 			
 			Component stackName = rawComp.setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
-			Component comp = new TranslatableComponent("morphtool.sudo_name", stackName);
+			Component comp = Component.translatable("morphtool.sudo_name", stackName);
 			stack.setHoverName(comp);
 		}
 
