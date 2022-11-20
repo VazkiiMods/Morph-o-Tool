@@ -135,7 +135,7 @@ public class AttachementRecipe extends CustomRecipe {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return MorphRecipeSerializer.ATTACHMENT;
+		return ModItems.ATTACHMENT;
 	}
 
 }
