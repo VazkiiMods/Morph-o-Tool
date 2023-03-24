@@ -71,7 +71,8 @@ public class ConfigHandler {
 						"xnet=rftools",
 						"buildcrafttransport=buildcraft",
 						"buildcraftfactory=buildcraft",
-						"buildcraftsilicon=buildcraft"),
+						"buildcraftsilicon=buildcraft",
+						"extrastorage=refinedstorage"),
 				Predicates.alwaysTrue());
 
 	}
