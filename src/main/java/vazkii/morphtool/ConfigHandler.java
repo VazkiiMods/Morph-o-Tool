@@ -72,6 +72,7 @@ public class ConfigHandler {
 						"buildcrafttransport=buildcraft",
 						"buildcraftfactory=buildcraft",
 						"buildcraftsilicon=buildcraft",
+						"cabletiers=refinedstorage",
 						"extrastorage=refinedstorage"),
 				Predicates.alwaysTrue());
 
