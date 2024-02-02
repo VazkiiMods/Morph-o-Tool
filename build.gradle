@@ -79,18 +79,8 @@ minecraft {
     }
 }
 
-repositories {
-    maven {
-        // for AutoRegLib
-        name "blamejared"
-        url "https://maven.blamejared.com/"
-    }
-}
-
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
-
-    implementation fg.deobf("vazkii.autoreglib:AutoRegLib:${config.arl_version}")
 }
 
 spotless {
