@@ -35,7 +35,7 @@ jobs:
       run: |
         VERSION=$(awk -F '=' '/^version/ { print $2; }' build.properties)
         BUILD=$(awk -F '=' '/build_number/ { print $2; }' build.properties)
-        echo "forge=build/libs/Morphtool-${VERSION}-${BUILD}.jar" >> "$GITHUB_OUTPUT"
+        echo "forge=build/libs/Morph-o-Tool-${VERSION}-${BUILD}.jar" >> "$GITHUB_OUTPUT"
     - name: Sign jars
       env:
         SIGNING_KEY: ${{ secrets.VIOLET_MOON_SIGNING_KEY }}
