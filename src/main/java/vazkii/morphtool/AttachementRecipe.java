@@ -1,10 +1,12 @@
 package vazkii.morphtool;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
@@ -12,8 +14,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class AttachementRecipe extends CustomRecipe {
 
-	public AttachementRecipe(ResourceLocation idIn) {
-		super(idIn);
+	public AttachementRecipe(ResourceLocation idIn, CraftingBookCategory pCategory) {
+		super(idIn, pCategory);
 	}
 
 	@Override
@@ -29,7 +31,7 @@ public class AttachementRecipe extends CustomRecipe {
 						return false;
 					}
 					foundTarget = true;
-				} else if (stack.getItem() == ModItems.tool) {
+				} else if (stack.is(Registries.MORPH_TOOL.get())) {
 					if (foundTool) {
 						return false;
 					}
@@ -44,14 +46,14 @@ public class AttachementRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(CraftingContainer var1) {
+	public ItemStack assemble(CraftingContainer var1, RegistryAccess pRegistryAccess) {
 		ItemStack tool = ItemStack.EMPTY;
 		ItemStack target = ItemStack.EMPTY;
 
 		for (int i = 0; i < var1.getContainerSize(); i++) {
 			ItemStack stack = var1.getItem(i);
 			if (!stack.isEmpty()) {
-				if (stack.getItem() == ModItems.tool) {
+				if (stack.is(Registries.MORPH_TOOL.get())) {
 					tool = stack;
 				} else {
 					target = stack;
@@ -124,7 +126,7 @@ public class AttachementRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public ItemStack getResultItem() {
+	public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
 		return ItemStack.EMPTY;
 	}
 
@@ -135,7 +137,7 @@ public class AttachementRecipe extends CustomRecipe {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return ModItems.ATTACHMENT;
+		return Registries.ATTACHMENT.get();
 	}
 
 }

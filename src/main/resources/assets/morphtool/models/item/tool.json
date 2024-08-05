@@ -1,6 +1,6 @@
 {
-	"parent": "item/handheld",
-	"textures": { 
-		"layer0": "morphtool:items/tool"
+	"parent": "minecraft:item/handheld",
+	"textures": {
+		"layer0": "morphtool:item/tool"
 	}
 }

@@ -1,4 +1,5 @@
 {
   "morphtool.sudo_name": "Morphing Tool (%s)",
-  "item.morphtool.tool": "Morphing Tool"
+  "item.morphtool.tool": "Morphing Tool",
+  "morphtool.misc.shift_for_info": "§7Hold §bSHIFT§7 for more info"
 }

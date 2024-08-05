@@ -15,8 +15,8 @@ import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.event.TickEvent.Phase;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 import vazkii.morphtool.network.MessageMorphTool;
+import vazkii.morphtool.network.NetworkHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,16 +39,16 @@ public class ClientHandler {
 
 				//Get looked at Mod
 				if (res != null && res.getType() == HitResult.Type.BLOCK) {
-					BlockState state = player.level.getBlockState(((BlockHitResult) res).getBlockPos());
+					BlockState state = player.level().getBlockState(((BlockHitResult) res).getBlockPos());
 					String modlook = MorphingHandler.getModFromState(state);
 					//Morph tool to looked at Mod
 					newStack = MorphingHandler.getShiftStackForMod(mainHandItem, modlook);
 				}
 
-				if (newStack != mainHandItem && !ItemStack.isSame(newStack, mainHandItem)) {
+				if (newStack != mainHandItem && !ItemStack.isSameItemSameTags(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
 					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
-					MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, inventory.selected));
+					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
 					MorphTool.proxy.updateEquippedItem();
 				}
 			}
@@ -68,7 +68,7 @@ public class ClientHandler {
 
 				//Get looked at Mod
 				if (res != null && res.getType() == HitResult.Type.BLOCK) {
-					BlockState state = player.level.getBlockState(((BlockHitResult) res).getBlockPos());
+					BlockState state = player.level().getBlockState(((BlockHitResult) res).getBlockPos());
 					modlook = MorphingHandler.getModFromState(state);
 				}
 
@@ -83,10 +83,10 @@ public class ClientHandler {
 					}
 				}
 
-				if (newStack != mainHandItem && !ItemStack.isSame(newStack, mainHandItem)) {
+				if (newStack != mainHandItem && !ItemStack.isSameItemSameTags(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
 					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
-					MorphTool.NETWORKHANDLER.sendToServer(new MessageMorphTool(newStack, inventory.selected));
+					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
 					MorphTool.proxy.updateEquippedItem();
 				}
 			}

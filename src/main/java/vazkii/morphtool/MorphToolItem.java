@@ -1,35 +1,31 @@
 package vazkii.morphtool;
 
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
-
-import vazkii.arl.item.BasicItem;
-import vazkii.arl.util.TooltipHandler;
 
 import javax.annotation.Nullable;
-
-import java.util.ArrayList;
 import java.util.List;
 
-public class MorphToolItem extends BasicItem {
+public class MorphToolItem extends Item {
 
 	public MorphToolItem() {
-		super("morphtool:tool", new Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS));
+		super(new Properties().stacksTo(1));
 	}
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
+		/*TODO decide if this feature should be kept. The below code doesn't work since 1.19, no one has complained so far tho.
 		BlockState block = context.getLevel().getBlockState(context.getClickedPos());
 		block.rotate(context.getLevel(), context.getClickedPos(), Rotation.CLOCKWISE_90);
+
+		 */
 		return super.useOn(context);
 	}
 
@@ -40,13 +36,11 @@ public class MorphToolItem extends BasicItem {
 		}
 
 		CompoundTag data = stack.getTag().getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
-		if (data.getAllKeys().size() == 0) {
+		if (data.getAllKeys().isEmpty()) {
 			return;
 		}
 
-		List<String> tooltipList = new ArrayList<>();
-
-		TooltipHandler.tooltipIfShift(tooltipList, () -> {
+		if (Screen.hasShiftDown()) {
 			for (String s : data.getAllKeys()) {
 				CompoundTag cmp = data.getCompound(s);
 				if (cmp != null) {
@@ -65,9 +59,9 @@ public class MorphToolItem extends BasicItem {
 					}
 				}
 			}
-		});
-
-		tooltipList.forEach(tip -> tooltip.add(Component.literal(tip)));
+		} else {
+			tooltip.add(Component.translatable(MorphTool.MOD_ID + ".misc.shift_for_info"));
+		}
 	}
 
 }
