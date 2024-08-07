@@ -1,6 +1,7 @@
 package vazkii.morphtool;
 
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -9,6 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -21,11 +25,13 @@ public class MorphToolItem extends Item {
 
 	@Override
 	public InteractionResult useOn(UseOnContext context) {
-		/*TODO decide if this feature should be kept. The below code doesn't work since 1.19, no one has complained so far tho.
+		Level level = context.getLevel();
+		BlockPos pos = context.getClickedPos();
 		BlockState block = context.getLevel().getBlockState(context.getClickedPos());
-		block.rotate(context.getLevel(), context.getClickedPos(), Rotation.CLOCKWISE_90);
+		if (level.setBlock(pos, block.rotate(level, pos, Rotation.CLOCKWISE_90), Block.UPDATE_ALL)) {
+			return InteractionResult.sidedSuccess(level.isClientSide);
+		}
 
-		 */
 		return super.useOn(context);
 	}
 

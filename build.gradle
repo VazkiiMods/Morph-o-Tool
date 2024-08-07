@@ -78,8 +78,6 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
-
-    implementation fg.deobf("curse.maven:create-328085:4625535")
 }
 
 spotless {

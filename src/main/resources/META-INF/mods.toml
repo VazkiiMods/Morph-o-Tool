@@ -8,8 +8,7 @@ modId="morphtool"
 displayName="Morph-o-Tool"
 version="${file.jarVersion}"
 authors="Vazkii, MoreThanHidden, Uraneptus"
-description='''
-The wrench to end all wrenches.'''
+description='''The wrench to end all wrenches.'''
 
 [[dependencies.morphtool]]
     modId="forge"
