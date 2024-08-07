@@ -73,14 +73,6 @@ public final class MorphingHandler {
 				}
 
 				copyCmp.remove("display");
-				Component displayName = null;
-				CompoundTag nameCmp = (CompoundTag) copyCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
-				if (nameCmp != null) {
-					displayName = Component.literal(nameCmp.getString("text"));
-				}
-				if (displayName != null && !displayName.getString().isEmpty() && displayName != copy.getHoverName()) {
-					copy.setHoverName(displayName);
-				}
 
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
