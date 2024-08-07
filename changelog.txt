@@ -1,2 +1,2 @@
-- Updated several lang files
-- Added a several mod items to the default config
+- Fixed: Rotation feature not working
+- Fixed: Removing an Item from the Tool changes its title to the raw name

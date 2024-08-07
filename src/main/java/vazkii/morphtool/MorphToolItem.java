@@ -31,7 +31,6 @@ public class MorphToolItem extends Item {
 		if (level.setBlock(pos, block.rotate(level, pos, Rotation.CLOCKWISE_90), Block.UPDATE_ALL)) {
 			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-
 		return super.useOn(context);
 	}
 

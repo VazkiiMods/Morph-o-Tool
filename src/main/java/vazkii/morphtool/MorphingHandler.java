@@ -73,6 +73,7 @@ public final class MorphingHandler {
 				}
 
 				copyCmp.remove("display");
+
 				copyCmp.remove(TAG_MORPHING_TOOL);
 				copyCmp.remove(TAG_MORPH_TOOL_DISPLAY_NAME);
 				copyCmp.remove(TAG_MORPH_TOOL_DATA);
