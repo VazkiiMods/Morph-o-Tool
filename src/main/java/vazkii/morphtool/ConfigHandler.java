@@ -2,9 +2,7 @@ package vazkii.morphtool;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
-
 import net.minecraftforge.common.ForgeConfigSpec;
-
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;

@@ -1,10 +1,5 @@
 package vazkii.morphtool;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.function.Consumer;
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -24,6 +19,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public final class MorphingHandler {
 
@@ -52,7 +52,7 @@ public final class MorphingHandler {
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && stack.getItem() != ModItems.tool) {
+		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && !stack.is(Registries.MORPH_TOOL.get())) {
 			CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, morphData);
@@ -138,14 +138,14 @@ public final class MorphingHandler {
 
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
-			stack = new ItemStack(ModItems.tool);
+			stack = new ItemStack(Registries.MORPH_TOOL.get());
 		} else {
 			CompoundTag targetCmp = morphData.getCompound(targetMod);
 			morphData.remove(targetMod);
 
 			stack = ItemStack.of(targetCmp);
 			if (stack.isEmpty()) {
-				stack = new ItemStack(ModItems.tool);
+				stack = new ItemStack(Registries.MORPH_TOOL.get());
 			}
 		}
 
@@ -157,7 +157,7 @@ public final class MorphingHandler {
 		stackCmp.put(TAG_MORPH_TOOL_DATA, morphData);
 		stackCmp.putBoolean(TAG_MORPHING_TOOL, true);
 
-		if (stack.getItem() != ModItems.tool) {
+		if (!stack.is(Registries.MORPH_TOOL.get())) {
 			CompoundTag displayName = new CompoundTag();
 			CompoundTag ogDisplayName = displayName;
 			displayName.putString("text",  Component.Serializer.toJson(stack.getHoverName()));
@@ -201,7 +201,7 @@ public final class MorphingHandler {
 			return false;
 		}
 
-		if (stack.getItem() == ModItems.tool) {
+		if (stack.is(Registries.MORPH_TOOL.get())) {
 			return true;
 		}
 

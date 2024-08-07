@@ -1,7 +1,6 @@
 package vazkii.morphtool.proxy;
 
 import net.minecraftforge.common.MinecraftForge;
-
 import vazkii.morphtool.MorphingHandler;
 
 public class CommonProxy {

@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[40,)"
+loaderVersion="[47,)"
 issueTrackerURL="https://github.com/Vazkii/Morph-o-Tool"
 license="Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License"
 
@@ -9,16 +9,10 @@ displayName="Morph-o-Tool"
 version="${file.jarVersion}"
 authors="Vazkii, MoreThanHidden, Uraneptus"
 description='''The wrench to end all wrenches.'''
-[[dependencies.morphtool]]
-    modId="autoreglib"
-    mandatory=true
-    versionRange="[1.7-52,)"
-    ordering="AFTER"
-    side="BOTH"
 
 [[dependencies.morphtool]]
     modId="forge"
     mandatory=true
-    versionRange="[38.0.17,)"
+    versionRange="[47.1.0,)"
     ordering="AFTER"
     side="BOTH"
