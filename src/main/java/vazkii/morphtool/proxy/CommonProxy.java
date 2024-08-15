@@ -1,12 +1,12 @@
 package vazkii.morphtool.proxy;
 
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import vazkii.morphtool.MorphingHandler;
 
 public class CommonProxy {
 
 	public void preInit() {
-		MinecraftForge.EVENT_BUS.register(MorphingHandler.INSTANCE);
+		NeoForge.EVENT_BUS.register(MorphingHandler.INSTANCE);
 	}
 
 	public void updateEquippedItem() {

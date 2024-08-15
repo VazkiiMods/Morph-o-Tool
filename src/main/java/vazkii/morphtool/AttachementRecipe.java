@@ -1,30 +1,29 @@
 package vazkii.morphtool;
 
-import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
+import vazkii.morphtool.data_components.ToolContentComponent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AttachementRecipe extends CustomRecipe {
 
-	public AttachementRecipe(ResourceLocation idIn, CraftingBookCategory pCategory) {
-		super(idIn, pCategory);
+	public AttachementRecipe(CraftingBookCategory pCategory) {
+		super(pCategory);
 	}
 
 	@Override
-	public boolean matches(CraftingContainer var1, Level var2) {
+	public boolean matches(CraftingInput input, Level var2) {
 		boolean foundTool = false;
 		boolean foundTarget = false;
 
-		for (int i = 0; i < var1.getContainerSize(); i++) {
-			ItemStack stack = var1.getItem(i);
+		for (int i = 0; i < input.size(); i++) {
+			ItemStack stack = input.getItem(i);
 			if (!stack.isEmpty()) {
 				if (isTarget(stack)) {
 					if (foundTarget) {
@@ -46,12 +45,12 @@ public class AttachementRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public ItemStack assemble(CraftingContainer var1, RegistryAccess pRegistryAccess) {
+	public ItemStack assemble(CraftingInput input, HolderLookup.Provider provider) {
 		ItemStack tool = ItemStack.EMPTY;
 		ItemStack target = ItemStack.EMPTY;
 
-		for (int i = 0; i < var1.getContainerSize(); i++) {
-			ItemStack stack = var1.getItem(i);
+		for (int i = 0; i < input.size(); i++) {
+			ItemStack stack = input.getItem(i);
 			if (!stack.isEmpty()) {
 				if (stack.is(Registries.MORPH_TOOL.get())) {
 					tool = stack;
@@ -61,27 +60,24 @@ public class AttachementRecipe extends CustomRecipe {
 			}
 		}
 
+		if (!tool.has(Registries.TOOL_CONTENT)) return ItemStack.EMPTY;
 		ItemStack copy = tool.copy();
-		CompoundTag cmp = copy.getTag();
-		if (cmp == null) {
-			cmp = new CompoundTag();
-			copy.setTag(cmp);
-		}
-
-		if (!cmp.contains(MorphingHandler.TAG_MORPH_TOOL_DATA)) {
-			cmp.put(MorphingHandler.TAG_MORPH_TOOL_DATA, new CompoundTag());
-		}
-
-		CompoundTag morphData = cmp.getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
 		String mod = MorphingHandler.getModFromStack(target);
+		ToolContentComponent contents = copy.get(Registries.TOOL_CONTENT);
+		List<ItemStack> contentStacks = new ArrayList<>(List.copyOf(copy.get(Registries.TOOL_CONTENT).contents()));
 
-		if (morphData.contains(mod)) {
-			return ItemStack.EMPTY;
+		//This assures that only one item of a mod is in the tool
+		if (!contentStacks.isEmpty()) {
+			for (ItemStack contentStack : contentStacks) {
+				if (BuiltInRegistries.ITEM.getKey(contentStack.getItem()).getNamespace().equals(mod)) {
+					return ItemStack.EMPTY;
+				}
+			}
 		}
 
-		CompoundTag modCmp = new CompoundTag();
-		target.save(modCmp);
-		morphData.put(mod, modCmp);
+		contentStacks.add(target);
+
+		copy.set(Registries.TOOL_CONTENT, new ToolContentComponent(contentStacks));
 
 		return copy;
 	}
@@ -109,7 +105,7 @@ public class AttachementRecipe extends CustomRecipe {
 			return false;
 		}
 
-		ResourceLocation registryNameRL = ForgeRegistries.ITEMS.getKey(stack.getItem());
+		ResourceLocation registryNameRL = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		String registryName = registryNameRL.toString();
 		if (ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue())) {
 			return true;
@@ -123,16 +119,6 @@ public class AttachementRecipe extends CustomRecipe {
 		}
 
 		return false;
-	}
-
-	@Override
-	public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
-		return ItemStack.EMPTY;
-	}
-
-	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
-		return NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 	}
 
 	@Override

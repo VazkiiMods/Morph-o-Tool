@@ -3,9 +3,7 @@ plugins {
     id 'maven-publish'
     id 'pmd'
     id 'com.diffplug.spotless' version '5.12.5'
-    id 'net.minecraftforge.gradle' version '5.1.+'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
-    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.neoforged.gradle.userdev' version '7.0.145'
 }
 
 ext.configFile = file('build.properties')
@@ -13,9 +11,16 @@ ext.config = parseConfig(configFile)
 
 version = "${config.version}-${config.build_number}"
 group = "vazkii.${config.mod_id}" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = config.mod_name
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+repositories {
+    mavenLocal()
+}
+
+base {
+    archivesName = config.mod_name
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 compileJava.options.compilerArgs << "-Xlint:all,-classfile,-processing,-deprecation" << "-Werror"
 
@@ -23,50 +28,14 @@ if (System.getenv('BUILD_NUMBER') != null) {
     version += "." + System.getenv('BUILD_NUMBER')
 }
 
-minecraft {
-    // The mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   Snapshot are built nightly.
-    // stable_#            Stables are built at the discretion of the MCP team.
-    // Use non-default mappings at your own risk. they may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
+runs {
+    configureEach {
+        systemProperty 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+        systemProperty 'forge.logging.console.level', 'debug'
+        modSource project.sourceSets.main
+    }
 
-    mappings channel: "${config.mapping_channel}", version: "${config.mapping_version}"
-    // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                morphtool {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            // Recommended logging data for a userdev environment
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-
-            // Recommended logging level for the console
-            property 'forge.logging.console.level', 'debug'
-
-            mods {
-                morphtool {
-                    source sourceSets.main
-                }
-            }
-        }
+    client {
     }
 }
 
@@ -77,7 +46,9 @@ repositories {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
+    implementation "net.neoforged:neoforge:21.1.1"
+
+    implementation "curse.maven:applied-energistics-2-223794:5610903"
 }
 
 spotless {
@@ -96,7 +67,6 @@ pmd {
     toolVersion '6.22.0'
     // no way around this warning unless we upgrade Gradle, apparently
     //incrementalAnalysis.set(true)
-    ruleSets.clear()
     ruleSetFiles = files("spotless/pmd-ruleset.xml")
 }
 
@@ -115,7 +85,7 @@ task incrementBuildNumber {
 
 import java.util.regex.Pattern
 task sortArtifacts(type: Copy) {
-    from jar.destinationDir
+    from jar.getDestinationDirectory()
     into config.dir_output
     //Put each jar with a classifier in a subfolder with the classifier as its name
     eachFile {
@@ -142,7 +112,7 @@ def parseConfig(File config) {
 
 jar {
     //rename the default output, for some better... sanity with scipts
-    archiveName = "${baseName}-${version}.${extension}"
+    //archiveName = "${archiveBaseName}-${archiveVersion}.${archiveExtension}"
 
     manifest {
         attributes([

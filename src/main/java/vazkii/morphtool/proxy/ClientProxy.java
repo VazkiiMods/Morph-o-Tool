@@ -2,7 +2,7 @@ package vazkii.morphtool.proxy;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.common.MinecraftForge;
+import net.neoforged.neoforge.common.NeoForge;
 import vazkii.morphtool.ClientHandler;
 import vazkii.morphtool.ConfigHandler;
 
@@ -11,7 +11,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit() {
 		super.preInit();
-		MinecraftForge.EVENT_BUS.register(ClientHandler.INSTANCE);
+		NeoForge.EVENT_BUS.register(ClientHandler.INSTANCE);
 	}
 
 	@Override

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " GB",
+    " IR",
+    "I  "
+  ],
+  "key": {
+    "R": {"tag": "c:dyes/red"},
+    "G": {"tag": "c:dyes/green"},
+    "B": {"tag": "c:dyes/blue"},
+    "I": {"tag": "c:ingots/iron"}
+  },
+  "result": {
+    "id": "morphtool:tool"
+  }
+}
