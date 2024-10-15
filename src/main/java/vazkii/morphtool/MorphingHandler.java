@@ -1,11 +1,11 @@
 package vazkii.morphtool;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -20,6 +20,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
 import net.neoforged.neoforgespi.language.IModInfo;
+import org.jetbrains.annotations.NotNull;
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.*;
@@ -46,14 +47,15 @@ public final class MorphingHandler {
 		removeItemFromTool(event.getEntity(), event.getOriginal(), true, (ItemStack morph) -> event.getEntity().setItemInHand(event.getHand(), morph));
 	}
 
+	//TODO next fix this
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
 		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && !stack.is(Registries.MORPH_TOOL.get())) {
 			ToolContentComponent contents = stack.get(Registries.TOOL_CONTENT);
 			//CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
-			ItemStack morph = makeMorphedStack(stack, MINECRAFT, contents);
+			ItemStack morph = makeMorphedStack(stack, MINECRAFT);
 			String mod = getModFromStack(stack);
-			List<ItemStack> newStacks = new ArrayList<>(List.copyOf(contents.contents()));
+			List<ItemStack> newStacks = new ArrayList<>(List.copyOf(contents.getItems()));
 			newStacks.remove(getStackFromMod(contents, mod));
 			ToolContentComponent newContents = new ToolContentComponent(newStacks);
 
@@ -126,34 +128,22 @@ public final class MorphingHandler {
 			return stack;
 		}
 
-		ToolContentComponent contentComponent = stack.get(Registries.TOOL_CONTENT);
-		return makeMorphedStack(stack, mod, contentComponent);
+		return makeMorphedStack(stack, mod);
 	}
 
-	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, ToolContentComponent contentComponent) {
+	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod) {
 		String currentMod = getModFromStack(currentStack);
+		ToolContentComponent currentContent = currentStack.get(Registries.TOOL_CONTENT);
+		ToolContentComponent newStackComponent = new ToolContentComponent(List.of(currentStack));
+		if (currentContent == null) return ItemStack.EMPTY;
 
-		ToolContentComponent currentStackComponent = new ToolContentComponent(List.of(currentStack));
-
-		/*
-		CompoundTag currentCmp = new CompoundTag();
-		currentStack.save(currentCmp);
-		currentCmp = currentCmp.copy();
-		if (currentCmp.contains("tag")) {
-			currentCmp.getCompound("tag").remove(TAG_MORPH_TOOL_DATA);
-		}
-
-		 */
-
-		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID)) {
-			contentComponent = currentStackComponent;
-		}
+		ToolContentComponent.Mutable mutable = getMutable(currentContent, newStackComponent, currentMod);
 
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
 			stack = new ItemStack(Registries.MORPH_TOOL.get());
 		} else {
-			stack = getStackFromMod(contentComponent, targetMod);
+			stack = getStackFromMod(currentContent, targetMod);
 
 			if (stack.isEmpty()) {
 				stack = new ItemStack(Registries.MORPH_TOOL.get());
@@ -164,10 +154,11 @@ public final class MorphingHandler {
 		if (!stack.hasTag()) {
 			stack.setTag(new CompoundTag());
 		}
-
 		 */
 
-		stack.set(Registries.TOOL_CONTENT, contentComponent);
+		mutable.remove(stack);
+
+		stack.set(Registries.TOOL_CONTENT, mutable.toImmutable());
 		stack.set(Registries.IS_MORPH_TOOL, true);
 
 		/*
@@ -183,7 +174,7 @@ public final class MorphingHandler {
 			CompoundTag displayName = new CompoundTag();
 			CompoundTag ogDisplayName = displayName;
 			displayName.putString("text",  Component.Serializer.toJson(stack.getHoverName()));
-			
+
 			if (stackCmp.contains(TAG_MORPH_TOOL_DISPLAY_NAME)) {
 				displayName = (CompoundTag) stackCmp.get(TAG_MORPH_TOOL_DISPLAY_NAME);
 			} else {
@@ -197,19 +188,49 @@ public final class MorphingHandler {
 			}
 
 			 */
+
+
+			Component hoverName = stack.getHoverName();
+
+			if (!stack.has(Registries.OG_DISPLAY_NAME)) {
+				stack.set(Registries.OG_DISPLAY_NAME, hoverName);
+			} else {
+				hoverName = stack.get(Registries.OG_DISPLAY_NAME);
+			}
 			
-			Component stackName = Component.literal(stack.getDisplayName().getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
+			Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = Component.translatable("morphtool.sudo_name", stackName);
-			stack.set(DataComponents.ITEM_NAME, comp);
+			stack.set(DataComponents.CUSTOM_NAME, comp);
+
 		}
 
 		stack.setCount(1);
 		return stack;
 	}
 
+	private static ToolContentComponent.Mutable getMutable(ToolContentComponent currentContent, ToolContentComponent newStackComponent, String currentMod) {
+		ToolContentComponent.Mutable currentContentMutable = new ToolContentComponent.Mutable(currentContent);
+		ToolContentComponent.Mutable newStackComponentMutable = new ToolContentComponent.Mutable(newStackComponent);
+
+		/*
+		CompoundTag currentCmp = new CompoundTag();
+		currentStack.save(currentCmp);
+		currentCmp = currentCmp.copy();
+		if (currentCmp.contains("tag")) {
+			currentCmp.getCompound("tag").remove(TAG_MORPH_TOOL_DATA);
+		}
+
+		 */
+
+		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID)) {
+			currentContentMutable.tryInsert(newStackComponent.getItems().getFirst());
+		}
+		return currentContentMutable;
+	}
+
 	public static ItemStack getStackFromMod(ToolContentComponent component, String mod) {
 		if (component != null && !component.isEmpty()) {
-			for (ItemStack contentStack : component.contents()) {
+			for (ItemStack contentStack : component.getItems()) {
 				if (BuiltInRegistries.ITEM.getKey(contentStack.getItem()).getNamespace().equals(mod)) {
 					return contentStack;
 				}

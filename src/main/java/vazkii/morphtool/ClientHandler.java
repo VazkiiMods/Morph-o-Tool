@@ -16,6 +16,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import vazkii.morphtool.data_components.ToolContentComponent;
 import vazkii.morphtool.network.MessageMorphTool;
+import vazkii.morphtool.network.NetworkHandler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,7 +47,7 @@ public class ClientHandler {
 				if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
 					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
-					PacketDistributor.sendToServer(new MessageMorphTool(newStack, inventory.selected));
+					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
 					MorphTool.proxy.updateEquippedItem();
 				}
 			}
@@ -84,7 +85,7 @@ public class ClientHandler {
 				if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
 					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
-					PacketDistributor.sendToServer(new MessageMorphTool(newStack, inventory.selected));
+					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
 					MorphTool.proxy.updateEquippedItem();
 				}
 			}
@@ -93,7 +94,7 @@ public class ClientHandler {
 
 	public static List<String> getModsFromStacks(ToolContentComponent toolContents) {
 		List<String> mods = new ArrayList<>();
-		for (ItemStack stack : toolContents.contents()) {
+		for (ItemStack stack : toolContents.getItems()) {
 			mods.add(MorphingHandler.getModFromStack(stack));
 		}
 		return mods;

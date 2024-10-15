@@ -64,7 +64,11 @@ public class AttachementRecipe extends CustomRecipe {
 		ItemStack copy = tool.copy();
 		String mod = MorphingHandler.getModFromStack(target);
 		ToolContentComponent contents = copy.get(Registries.TOOL_CONTENT);
-		List<ItemStack> contentStacks = new ArrayList<>(List.copyOf(copy.get(Registries.TOOL_CONTENT).contents()));
+		if (contents == null) {
+			return ItemStack.EMPTY;
+		}
+		/*
+		List<ItemStack> contentStacks = new ArrayList<>(List.copyOf(copy.get(Registries.TOOL_CONTENT).getItems()));
 
 		//This assures that only one item of a mod is in the tool
 		if (!contentStacks.isEmpty()) {
@@ -78,6 +82,14 @@ public class AttachementRecipe extends CustomRecipe {
 		contentStacks.add(target);
 
 		copy.set(Registries.TOOL_CONTENT, new ToolContentComponent(contentStacks));
+
+		 */
+		ToolContentComponent.Mutable mutable = new ToolContentComponent.Mutable(contents);
+		if (!target.isEmpty()) {
+			mutable.tryInsert(target);
+		}
+		copy.set(Registries.TOOL_CONTENT, mutable.toImmutable());
+
 
 		return copy;
 	}

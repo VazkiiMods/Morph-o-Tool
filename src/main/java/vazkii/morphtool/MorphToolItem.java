@@ -53,11 +53,18 @@ public class MorphToolItem extends Item {
 		 */
 
 		if (Screen.hasShiftDown()) {
-			for (ItemStack contentStack : contents.contents()) {
+			for (ItemStack contentStack : contents.getItems()) {
 				if (!contentStack.isEmpty()) {
-					String name = contentStack.getHoverName().getString();
+					Component name;
+					if (contentStack.has(Registries.OG_DISPLAY_NAME)) {
+						name = contentStack.get(Registries.OG_DISPLAY_NAME);
+					} else {
+						name = contentStack.getHoverName();
+					}
+
+
 					String mod = MorphingHandler.getModFromStack(contentStack);
-					tooltip.add(Component.literal(" " + mod + " : " + name));
+					tooltip.add(Component.literal(" " + mod + " : " + name.getString()));
 				}
 			}
 			/*
