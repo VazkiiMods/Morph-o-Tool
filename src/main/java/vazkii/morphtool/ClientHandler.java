@@ -13,7 +13,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+
 import vazkii.morphtool.data_components.ToolContentComponent;
 import vazkii.morphtool.network.MessageMorphTool;
 import vazkii.morphtool.network.NetworkHandler;

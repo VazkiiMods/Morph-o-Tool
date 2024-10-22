@@ -2,7 +2,9 @@ package vazkii.morphtool;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
+
 import net.neoforged.neoforge.common.ModConfigSpec;
+
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -23,10 +25,10 @@ public class ConfigHandler {
 	}
 
 	public ConfigHandler(ModConfigSpec.Builder builder) {
-		allItems = builder.define("Allow all items to be added", false);
-		invertHandShift = builder.define("Morph in the offhand instead of mainhand", false);
+		allItems = builder.define("allow_all_items", false); //Allow all items to be added
+		invertHandShift = builder.define("offhand_morph", false); //Morph in the offhand instead of mainhand
 
-		whitelistedItems = builder.defineList("Whitelisted Items",
+		whitelistedItems = builder.defineList("whitelist_items", //"Whitelisted Items"
 				Lists.newArrayList("botania:twig_wand",
 						"appliedenergistics2:network_tool",
 						"immersiveengineering:tool",
@@ -35,23 +37,26 @@ public class ConfigHandler {
 						"bloodmagic:ritual_reader",
 						"draconicevolution:crystal_binder",
 						"crossroads:omnimeter"),
+				String::new,
 				Predicates.alwaysTrue());
 
-		whitelistedNames = builder.defineList("Whitelisted Names",
+		whitelistedNames = builder.defineList("whitelist_names", //"Whitelisted Names"
 				Lists.newArrayList("wrench",
 						"screwdriver",
 						"hammer",
 						"rotator",
 						"configurator",
 						"crowbar"),
+				String::new,
 				Predicates.alwaysTrue());
 
-		blacklistedMods = builder.defineList("Blacklisted Mods",
+		blacklistedMods = builder.defineList("blacklist_mods", //Blacklisted Mods
 				Lists.newArrayList("tconstruct",
 						"intangible"),
+				String::new,
 				Predicates.alwaysTrue());
 
-		aliasesList = builder.defineList("Mod Aliases",
+		aliasesList = builder.defineList("mod_aliasses", //Mod Aliases
 				Lists.newArrayList("nautralpledge=botania",
 						"thermalexpansion=thermalfoundation",
 						"thermaldynamics=thermalfoundation",
@@ -72,6 +77,7 @@ public class ConfigHandler {
 						"buildcraftsilicon=buildcraft",
 						"cabletiers=refinedstorage",
 						"extrastorage=refinedstorage"),
+				String::new,
 				Predicates.alwaysTrue());
 
 	}

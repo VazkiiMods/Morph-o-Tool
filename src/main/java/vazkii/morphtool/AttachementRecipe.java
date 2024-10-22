@@ -4,12 +4,13 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CustomRecipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
-import vazkii.morphtool.data_components.ToolContentComponent;
 
-import java.util.ArrayList;
-import java.util.List;
+import vazkii.morphtool.data_components.ToolContentComponent;
 
 public class AttachementRecipe extends CustomRecipe {
 
@@ -60,36 +61,20 @@ public class AttachementRecipe extends CustomRecipe {
 			}
 		}
 
-		if (!tool.has(Registries.TOOL_CONTENT)) return ItemStack.EMPTY;
+		if (!tool.has(Registries.TOOL_CONTENT))
+			return ItemStack.EMPTY;
 		ItemStack copy = tool.copy();
 		String mod = MorphingHandler.getModFromStack(target);
 		ToolContentComponent contents = copy.get(Registries.TOOL_CONTENT);
 		if (contents == null) {
 			return ItemStack.EMPTY;
 		}
-		/*
-		List<ItemStack> contentStacks = new ArrayList<>(List.copyOf(copy.get(Registries.TOOL_CONTENT).getItems()));
 
-		//This assures that only one item of a mod is in the tool
-		if (!contentStacks.isEmpty()) {
-			for (ItemStack contentStack : contentStacks) {
-				if (BuiltInRegistries.ITEM.getKey(contentStack.getItem()).getNamespace().equals(mod)) {
-					return ItemStack.EMPTY;
-				}
-			}
-		}
-
-		contentStacks.add(target);
-
-		copy.set(Registries.TOOL_CONTENT, new ToolContentComponent(contentStacks));
-
-		 */
 		ToolContentComponent.Mutable mutable = new ToolContentComponent.Mutable(contents);
 		if (!target.isEmpty()) {
 			mutable.tryInsert(target);
 		}
 		copy.set(Registries.TOOL_CONTENT, mutable.toImmutable());
-
 
 		return copy;
 	}

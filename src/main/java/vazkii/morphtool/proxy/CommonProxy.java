@@ -1,6 +1,7 @@
 package vazkii.morphtool.proxy;
 
 import net.neoforged.neoforge.common.NeoForge;
+
 import vazkii.morphtool.MorphingHandler;
 
 public class CommonProxy {

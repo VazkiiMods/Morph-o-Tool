@@ -1,6 +1,7 @@
 package vazkii.morphtool;
 
 import com.mojang.serialization.Codec;
+
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -11,6 +12,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.function.Supplier;
