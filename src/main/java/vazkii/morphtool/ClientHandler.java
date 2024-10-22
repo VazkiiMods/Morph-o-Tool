@@ -72,7 +72,7 @@ public class ClientHandler {
 				}
 
 				//Manual Scroll for Morph (excluding looked at a mod block incase it also needs scrolling)
-				if (event.getScrollDeltaY() != 0 && player.isCrouching() && !modlook.equals(mod)) { //TODO scroll delta y or x?
+				if (event.getScrollDeltaY() != 0 && player.isCrouching() && !modlook.equals(mod)) {
 					if (mainHandItem.has(Registries.TOOL_CONTENT) && mainHandItem.get(Registries.TOOL_CONTENT) != null) {
 						ToolContentComponent contents = mainHandItem.get(Registries.TOOL_CONTENT);
 						mod = event.getScrollDeltaY() < 0 ? nextMod(contents, mod) : previousMod(contents, mod);
@@ -81,7 +81,6 @@ public class ClientHandler {
 						event.setCanceled(true);
 					}
 				}
-
 				if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
 					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);

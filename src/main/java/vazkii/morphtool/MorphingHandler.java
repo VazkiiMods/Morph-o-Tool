@@ -44,20 +44,30 @@ public final class MorphingHandler {
 
 	@SubscribeEvent
 	public void onItemBroken(PlayerDestroyItemEvent event) {
-		removeItemFromTool(event.getEntity(), event.getOriginal(), true, (ItemStack morph) -> event.getEntity().setItemInHand(event.getHand(), morph));
+		removeItemFromTool(event.getEntity(), event.getOriginal(), true, morph -> event.getEntity().setItemInHand(event.getHand(), morph));
 	}
 
-	//TODO next fix this
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
 		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && !stack.is(Registries.MORPH_TOOL.get())) {
 			ToolContentComponent contents = stack.get(Registries.TOOL_CONTENT);
+			if (contents == null) return;
+			ToolContentComponent.Mutable mutable = new ToolContentComponent.Mutable(contents);
 			//CompoundTag morphData = stack.getTag().getCompound(TAG_MORPH_TOOL_DATA).copy();
 
-			ItemStack morph = makeMorphedStack(stack, MINECRAFT);
-			String mod = getModFromStack(stack);
+			mutable.remove(stack);
+
+			stack.set(Registries.TOOL_CONTENT, mutable.toImmutable());
+
+			ItemStack morph = makeMorphedStack(stack, MINECRAFT, true);
+
+
+
+			/*
 			List<ItemStack> newStacks = new ArrayList<>(List.copyOf(contents.getItems()));
 			newStacks.remove(getStackFromMod(contents, mod));
 			ToolContentComponent newContents = new ToolContentComponent(newStacks);
+
+			 */
 
 			/*
 			CompoundTag newMorphData = morph.getTag().getCompound(TAG_MORPH_TOOL_DATA);
@@ -66,13 +76,16 @@ public final class MorphingHandler {
 			 */
 
 			if (!itemBroken) {
-				if (!e.getCommandSenderWorld().isClientSide) {
+ 				if (!e.getCommandSenderWorld().isClientSide) {
 					ItemEntity newItem = new ItemEntity(e.getCommandSenderWorld(), e.getX(), e.getY(), e.getZ(), morph);
 					e.getCommandSenderWorld().addFreshEntity(newItem);
 				}
 
 				ItemStack copy = stack.copy();
-				copy.set(Registries.TOOL_CONTENT, newContents);
+				copy.remove(Registries.TOOL_CONTENT);
+				copy.remove(Registries.IS_MORPH_TOOL);
+				copy.remove(DataComponents.CUSTOM_NAME);
+				copy.remove(Registries.OG_DISPLAY_NAME);
 				/*
 				CompoundTag copyCmp = copy.getTag();
 				if (copyCmp == null) {
@@ -128,16 +141,17 @@ public final class MorphingHandler {
 			return stack;
 		}
 
-		return makeMorphedStack(stack, mod);
+		return makeMorphedStack(stack, mod, false);
 	}
 
-	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod) {
+	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, boolean calledOnRemove) {
 		String currentMod = getModFromStack(currentStack);
 		ToolContentComponent currentContent = currentStack.get(Registries.TOOL_CONTENT);
+		currentStack.remove(Registries.TOOL_CONTENT);
 		ToolContentComponent newStackComponent = new ToolContentComponent(List.of(currentStack));
 		if (currentContent == null) return ItemStack.EMPTY;
 
-		ToolContentComponent.Mutable mutable = getMutable(currentContent, newStackComponent, currentMod);
+		ToolContentComponent.Mutable mutable = getMutable(currentContent, newStackComponent, currentMod, calledOnRemove);
 
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
@@ -190,13 +204,9 @@ public final class MorphingHandler {
 			 */
 
 
-			Component hoverName = stack.getHoverName();
 
-			if (!stack.has(Registries.OG_DISPLAY_NAME)) {
-				stack.set(Registries.OG_DISPLAY_NAME, hoverName);
-			} else {
-				hoverName = stack.get(Registries.OG_DISPLAY_NAME);
-			}
+
+			Component hoverName = getOrSetOGName(stack);
 			
 			Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = Component.translatable("morphtool.sudo_name", stackName);
@@ -208,7 +218,18 @@ public final class MorphingHandler {
 		return stack;
 	}
 
-	private static ToolContentComponent.Mutable getMutable(ToolContentComponent currentContent, ToolContentComponent newStackComponent, String currentMod) {
+	private static Component getOrSetOGName(ItemStack stack) {
+		Component hoverName = stack.getHoverName();
+		if (!stack.has(Registries.OG_DISPLAY_NAME)) {
+			stack.set(Registries.OG_DISPLAY_NAME, hoverName);
+		} else {
+			hoverName = stack.get(Registries.OG_DISPLAY_NAME);
+		}
+
+		return hoverName;
+	}
+
+	private static ToolContentComponent.Mutable getMutable(ToolContentComponent currentContent, ToolContentComponent newStackComponent, String currentMod, boolean calledOnRemove) {
 		ToolContentComponent.Mutable currentContentMutable = new ToolContentComponent.Mutable(currentContent);
 		ToolContentComponent.Mutable newStackComponentMutable = new ToolContentComponent.Mutable(newStackComponent);
 
@@ -222,7 +243,7 @@ public final class MorphingHandler {
 
 		 */
 
-		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID)) {
+		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID) && !calledOnRemove) {
 			currentContentMutable.tryInsert(newStackComponent.getItems().getFirst());
 		}
 		return currentContentMutable;
