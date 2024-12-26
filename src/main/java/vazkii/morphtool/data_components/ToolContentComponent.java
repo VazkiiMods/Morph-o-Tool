@@ -25,12 +25,8 @@ public class ToolContentComponent {
 		this.items = contents;
 	}
 
-	private static DataResult<ToolContentComponent> checkAndCreate(List<ItemStack> p_381706_) {
-		try {
-			return DataResult.success(new ToolContentComponent(p_381706_));
-		} catch (ArithmeticException arithmeticexception) {
-			return DataResult.error(() -> "Excessive total bundle weight");
-		}
+	private static DataResult<ToolContentComponent> checkAndCreate(List<ItemStack> stacks) {
+		return DataResult.success(new ToolContentComponent(stacks));
 	}
 
 	public boolean isEmpty() {
