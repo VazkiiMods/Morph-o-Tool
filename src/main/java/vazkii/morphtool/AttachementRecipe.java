@@ -64,7 +64,6 @@ public class AttachementRecipe extends CustomRecipe {
 		if (!tool.has(Registries.TOOL_CONTENT))
 			return ItemStack.EMPTY;
 		ItemStack copy = tool.copy();
-		String mod = MorphingHandler.getModFromStack(target);
 		ToolContentComponent contents = copy.get(Registries.TOOL_CONTENT);
 		if (contents == null) {
 			return ItemStack.EMPTY;
