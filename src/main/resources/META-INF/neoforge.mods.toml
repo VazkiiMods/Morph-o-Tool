@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[47,)"
+loaderVersion="[4,)"
 issueTrackerURL="https://github.com/Vazkii/Morph-o-Tool"
 license="Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License"
 
@@ -11,8 +11,14 @@ authors="Vazkii, MoreThanHidden, Uraneptus"
 description='''The wrench to end all wrenches.'''
 
 [[dependencies.morphtool]]
-    modId="forge"
-    mandatory=true
-    versionRange="[47.1.0,)"
+    modId="neoforge"
+    type="required"
+    versionRange="[21.0.143,)"
     ordering="AFTER"
+    side="BOTH"
+[[dependencies.morphtool]]
+    modId="minecraft"
+    type="required"
+    versionRange="[1.21,)"
+    ordering="NONE"
     side="BOTH"

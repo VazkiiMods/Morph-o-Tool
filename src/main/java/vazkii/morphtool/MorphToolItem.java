@@ -2,7 +2,6 @@ package vazkii.morphtool;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -14,13 +13,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
-import javax.annotation.Nullable;
+import vazkii.morphtool.data_components.ToolContentComponent;
+
 import java.util.List;
 
 public class MorphToolItem extends Item {
 
-	public MorphToolItem() {
-		super(new Properties().stacksTo(1));
+	public MorphToolItem(Properties properties) {
+		super(properties.stacksTo(1).component(Registries.IS_MORPH_TOOL, false).component(Registries.TOOL_CONTENT, ToolContentComponent.EMPTY));
 	}
 
 	@Override
@@ -35,33 +35,25 @@ public class MorphToolItem extends Item {
 	}
 
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag advanced) {
-		if (!stack.hasTag() || !stack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DATA)) {
+	public void appendHoverText(ItemStack stack, Item.TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag advanced) {
+		if (!stack.has(Registries.TOOL_CONTENT))
 			return;
-		}
 
-		CompoundTag data = stack.getTag().getCompound(MorphingHandler.TAG_MORPH_TOOL_DATA);
-		if (data.getAllKeys().isEmpty()) {
+		ToolContentComponent contents = stack.get(Registries.TOOL_CONTENT);
+		if (contents == null || contents.isEmpty())
 			return;
-		}
-
 		if (Screen.hasShiftDown()) {
-			for (String s : data.getAllKeys()) {
-				CompoundTag cmp = data.getCompound(s);
-				if (cmp != null) {
-					ItemStack modStack = ItemStack.of(cmp);
-					if (!stack.isEmpty()) {
-						String name = modStack.getHoverName().getString();
-						if (modStack.hasTag() && modStack.getTag().contains(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME)) {
-							CompoundTag rawName = ((CompoundTag) modStack.getTag().get(MorphingHandler.TAG_MORPH_TOOL_DISPLAY_NAME));
-							Component nameComp = Component.Serializer.fromJson(rawName.getString("text"));
-							if(nameComp != null)
-								name = nameComp.getString();
-						}
-						String mod = MorphingHandler.getModFromStack(modStack);
-
-						tooltip.add(Component.literal(" " + mod + " : " + name));
+			for (ItemStack contentStack : contents.getItems()) {
+				if (!contentStack.isEmpty()) {
+					Component name;
+					if (contentStack.has(Registries.OG_DISPLAY_NAME)) {
+						name = contentStack.get(Registries.OG_DISPLAY_NAME);
+					} else {
+						name = contentStack.getHoverName();
 					}
+
+					String mod = MorphingHandler.getModFromStack(contentStack);
+					tooltip.add(Component.literal(" " + mod + " : " + name.getString()));
 				}
 			}
 		} else {

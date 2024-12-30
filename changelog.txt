@@ -1,3 +1,1 @@
-- Ported to 1.20.1 (1.21 port is coming next)
-- Fixed: Rotation feature not working
-- Fixed: Removing an Item from the Tool changes its title to the raw name
+- Ported to 1.21.1
