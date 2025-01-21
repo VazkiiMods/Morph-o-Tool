@@ -1,0 +1,14 @@
+{
+  "morphtool.sudo_name": "變形工具（%s）",
+  "item.morphtool.tool": "變形工具",
+  "morphtool.misc.shift_for_info": "§7按住 §bSHIFT§7 查看更多資訊",
+  "morphtool.configuration.title": "標題",
+  "morphtool.configuration.offhand_morph.tooltip": "在副手變形而不是主手",
+  "morphtool.configuration.section.morphtool.common.toml.title": "變形工具配置",
+  "morphtool.configuration.blacklist_mods": "模組黑名單",
+  "morphtool.configuration.offhand_morph": "副手變形",
+  "morphtool.configuration.whitelist_items": "物品白名單",
+  "morphtool.configuration.whitelist_names": "名稱白名單",
+  "morphtool.configuration.mod_aliasses": "模組別名",
+  "morphtool.configuration.allow_all_items": "允許所有物品"
+}
