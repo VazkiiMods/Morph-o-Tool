@@ -21,10 +21,7 @@ import net.neoforged.neoforgespi.language.IModInfo;
 
 import vazkii.morphtool.data_components.ToolContentComponent;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public final class MorphingHandler {
@@ -106,6 +103,10 @@ public final class MorphingHandler {
 			return stack;
 		}
 
+		if (stack.is(MorphToolRegistries.MORPH_TOOL) && Objects.equals(mod, MINECRAFT)) {
+			return stack;
+		}
+
 		String currentMod = getModFromStack(stack);
 		if (mod.equals(currentMod)) {
 			return stack;
@@ -127,6 +128,7 @@ public final class MorphingHandler {
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
 			stack = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
+			stack.getComponents().stream().forEach(c -> System.out.println(c.type() + ": " + c.value()));
 		} else {
 			stack = getStackFromMod(currentContent, targetMod);
 

@@ -21,6 +21,7 @@ import vazkii.morphtool.network.NetworkHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientHandler {
