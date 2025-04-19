@@ -1,1 +1,1 @@
-- Ported to 1.21.1
+- Add zh_tw translation @EvanHsieh0415

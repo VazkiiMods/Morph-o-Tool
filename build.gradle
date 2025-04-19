@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
     id 'pmd'
     id 'com.diffplug.spotless' version '6.25.0'
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
+    id 'net.neoforged.gradle.userdev' version '7.0.184'
 }
 
 ext.configFile = file('build.properties')
@@ -46,11 +46,20 @@ repositories {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:21.1.1"
+    implementation "net.neoforged:neoforge:${config.neoforge_version}"
 
     //test mods
     implementation "curse.maven:applied-energistics-2-223794:5610903"
     implementation "curse.maven:storage-drawers-223852:5840297"
+    implementation "curse.maven:just-dire-things-1002348:6369120"
+
+    //Integrated dynamics
+    implementation "curse.maven:cyclops-core-232758:6414678"
+    implementation "curse.maven:common-capabilities-247007:6384335"
+    implementation "curse.maven:integrated-dynamics-236307:6418767"
+
+    implementation "curse.maven:mekanism-268560:6327955"
+    implementation "curse.maven:immersive-engineering-231951:6418024"
 }
 
 spotless {

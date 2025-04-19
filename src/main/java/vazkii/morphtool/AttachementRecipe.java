@@ -1,6 +1,7 @@
 package vazkii.morphtool;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -10,12 +11,19 @@ import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
+import org.jetbrains.annotations.NotNull;
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 public class AttachementRecipe extends CustomRecipe {
 
 	public AttachementRecipe(CraftingBookCategory pCategory) {
 		super(pCategory);
+	}
+
+	@Override
+	@NotNull
+	public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
+		return NonNullList.withSize(input.size(), ItemStack.EMPTY);
 	}
 
 	@Override
@@ -31,7 +39,7 @@ public class AttachementRecipe extends CustomRecipe {
 						return false;
 					}
 					foundTarget = true;
-				} else if (stack.is(Registries.MORPH_TOOL.get())) {
+				} else if (stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
 					if (foundTool) {
 						return false;
 					}
@@ -53,7 +61,7 @@ public class AttachementRecipe extends CustomRecipe {
 		for (int i = 0; i < input.size(); i++) {
 			ItemStack stack = input.getItem(i);
 			if (!stack.isEmpty()) {
-				if (stack.is(Registries.MORPH_TOOL.get())) {
+				if (stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
 					tool = stack;
 				} else {
 					target = stack;
@@ -61,10 +69,10 @@ public class AttachementRecipe extends CustomRecipe {
 			}
 		}
 
-		if (!tool.has(Registries.TOOL_CONTENT))
+		if (!tool.has(MorphToolRegistries.TOOL_CONTENT))
 			return ItemStack.EMPTY;
 		ItemStack copy = tool.copy();
-		ToolContentComponent contents = copy.get(Registries.TOOL_CONTENT);
+		ToolContentComponent contents = copy.get(MorphToolRegistries.TOOL_CONTENT);
 		if (contents == null) {
 			return ItemStack.EMPTY;
 		}
@@ -73,7 +81,7 @@ public class AttachementRecipe extends CustomRecipe {
 		if (!target.isEmpty()) {
 			mutable.tryInsert(target);
 		}
-		copy.set(Registries.TOOL_CONTENT, mutable.toImmutable());
+		copy.set(MorphToolRegistries.TOOL_CONTENT, mutable.toImmutable());
 
 		return copy;
 	}
@@ -119,7 +127,7 @@ public class AttachementRecipe extends CustomRecipe {
 
 	@Override
 	public RecipeSerializer<?> getSerializer() {
-		return Registries.ATTACHMENT.get();
+		return MorphToolRegistries.ATTACHMENT.get();
 	}
 
 }

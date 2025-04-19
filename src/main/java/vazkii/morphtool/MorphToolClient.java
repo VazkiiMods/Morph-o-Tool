@@ -26,7 +26,7 @@ public class MorphToolClient {
 
 	private void addToCreativeTab(BuildCreativeModeTabContentsEvent event) {
 		if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
-			event.accept(Registries.MORPH_TOOL);
+			event.accept(MorphToolRegistries.MORPH_TOOL);
 		}
 	}
 }

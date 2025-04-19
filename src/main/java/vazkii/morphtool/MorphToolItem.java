@@ -20,7 +20,7 @@ import java.util.List;
 public class MorphToolItem extends Item {
 
 	public MorphToolItem(Properties properties) {
-		super(properties.stacksTo(1).component(Registries.IS_MORPH_TOOL, false).component(Registries.TOOL_CONTENT, ToolContentComponent.EMPTY));
+		super(properties.stacksTo(1).component(MorphToolRegistries.IS_MORPH_TOOL, false).component(MorphToolRegistries.TOOL_CONTENT, ToolContentComponent.EMPTY));
 	}
 
 	@Override
@@ -36,18 +36,18 @@ public class MorphToolItem extends Item {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag advanced) {
-		if (!stack.has(Registries.TOOL_CONTENT))
+		if (!stack.has(MorphToolRegistries.TOOL_CONTENT))
 			return;
 
-		ToolContentComponent contents = stack.get(Registries.TOOL_CONTENT);
+		ToolContentComponent contents = stack.get(MorphToolRegistries.TOOL_CONTENT);
 		if (contents == null || contents.isEmpty())
 			return;
 		if (Screen.hasShiftDown()) {
 			for (ItemStack contentStack : contents.getItems()) {
 				if (!contentStack.isEmpty()) {
 					Component name;
-					if (contentStack.has(Registries.OG_DISPLAY_NAME)) {
-						name = contentStack.get(Registries.OG_DISPLAY_NAME);
+					if (contentStack.has(MorphToolRegistries.OG_DISPLAY_NAME)) {
+						name = contentStack.get(MorphToolRegistries.OG_DISPLAY_NAME);
 					} else {
 						name = contentStack.getHoverName();
 					}

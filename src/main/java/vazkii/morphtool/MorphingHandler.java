@@ -49,13 +49,13 @@ public final class MorphingHandler {
 	}
 
 	public static void removeItemFromTool(Entity e, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
-		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && !stack.is(Registries.MORPH_TOOL.get())) {
-			ToolContentComponent contents = stack.get(Registries.TOOL_CONTENT);
+		if (stack != null && !stack.isEmpty() && isMorphTool(stack) && !stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
+			ToolContentComponent contents = stack.get(MorphToolRegistries.TOOL_CONTENT);
 			if (contents == null)
 				return;
 			ToolContentComponent.Mutable mutable = new ToolContentComponent.Mutable(contents);
 			mutable.remove(stack);
-			stack.set(Registries.TOOL_CONTENT, mutable.toImmutable());
+			stack.set(MorphToolRegistries.TOOL_CONTENT, mutable.toImmutable());
 
 			ItemStack morph = makeMorphedStack(stack, MINECRAFT, true);
 
@@ -66,10 +66,10 @@ public final class MorphingHandler {
 				}
 
 				ItemStack copy = stack.copy();
-				copy.remove(Registries.TOOL_CONTENT);
-				copy.remove(Registries.IS_MORPH_TOOL);
+				copy.remove(MorphToolRegistries.TOOL_CONTENT);
+				copy.remove(MorphToolRegistries.IS_MORPH_TOOL);
 				copy.remove(DataComponents.CUSTOM_NAME);
-				copy.remove(Registries.OG_DISPLAY_NAME);
+				copy.remove(MorphToolRegistries.OG_DISPLAY_NAME);
 
 				consumer.accept(copy);
 			} else {
@@ -102,7 +102,7 @@ public final class MorphingHandler {
 	}
 
 	public static ItemStack getShiftStackForMod(ItemStack stack, String mod) {
-		if (!stack.has(Registries.TOOL_CONTENT)) {
+		if (!stack.has(MorphToolRegistries.TOOL_CONTENT)) {
 			return stack;
 		}
 
@@ -116,8 +116,8 @@ public final class MorphingHandler {
 
 	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, boolean calledOnRemove) {
 		String currentMod = getModFromStack(currentStack);
-		ToolContentComponent currentContent = currentStack.get(Registries.TOOL_CONTENT);
-		currentStack.remove(Registries.TOOL_CONTENT);
+		ToolContentComponent currentContent = currentStack.get(MorphToolRegistries.TOOL_CONTENT);
+		currentStack.remove(MorphToolRegistries.TOOL_CONTENT);
 		ToolContentComponent newStackComponent = new ToolContentComponent(List.of(currentStack));
 		if (currentContent == null)
 			return ItemStack.EMPTY;
@@ -126,21 +126,21 @@ public final class MorphingHandler {
 
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
-			stack = new ItemStack(Registries.MORPH_TOOL.get());
+			stack = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
 		} else {
 			stack = getStackFromMod(currentContent, targetMod);
 
 			if (stack.isEmpty()) {
-				stack = new ItemStack(Registries.MORPH_TOOL.get());
+				stack = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
 			}
 		}
 
 		mutable.remove(stack);
 
-		stack.set(Registries.TOOL_CONTENT, mutable.toImmutable());
-		stack.set(Registries.IS_MORPH_TOOL, true);
+		stack.set(MorphToolRegistries.TOOL_CONTENT, mutable.toImmutable());
+		stack.set(MorphToolRegistries.IS_MORPH_TOOL, true);
 
-		if (!stack.is(Registries.MORPH_TOOL.get())) {
+		if (!stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
 			Component hoverName = getOrSetOGName(stack);
 			Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = Component.translatable("morphtool.sudo_name", stackName);
@@ -153,10 +153,10 @@ public final class MorphingHandler {
 
 	private static Component getOrSetOGName(ItemStack stack) {
 		Component hoverName = stack.getHoverName();
-		if (!stack.has(Registries.OG_DISPLAY_NAME)) {
-			stack.set(Registries.OG_DISPLAY_NAME, hoverName);
+		if (!stack.has(MorphToolRegistries.OG_DISPLAY_NAME)) {
+			stack.set(MorphToolRegistries.OG_DISPLAY_NAME, hoverName);
 		} else {
-			hoverName = stack.get(Registries.OG_DISPLAY_NAME);
+			hoverName = stack.get(MorphToolRegistries.OG_DISPLAY_NAME);
 		}
 
 		return hoverName;
@@ -199,11 +199,11 @@ public final class MorphingHandler {
 			return false;
 		}
 
-		if (stack.is(Registries.MORPH_TOOL.get())) {
+		if (stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
 			return true;
 		}
 
-		return stack.has(Registries.IS_MORPH_TOOL) && Boolean.TRUE.equals(stack.get(Registries.IS_MORPH_TOOL));
+		return stack.has(MorphToolRegistries.IS_MORPH_TOOL) && Boolean.TRUE.equals(stack.get(MorphToolRegistries.IS_MORPH_TOOL));
 	}
 
 	public static HitResult raycast(Entity e, double len) {

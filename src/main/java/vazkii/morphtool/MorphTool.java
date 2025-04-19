@@ -16,9 +16,9 @@ public class MorphTool {
 	public MorphTool(IEventBus bus, ModContainer modContainer) {
 		bus.addListener(NetworkHandler::registerPayloadHandler);
 
-		Registries.DATA_COMPONENTS.register(bus);
-		Registries.ITEMS.register(bus);
-		Registries.SERIALIZERS.register(bus);
+		MorphToolRegistries.DATA_COMPONENTS.register(bus);
+		MorphToolRegistries.ITEMS.register(bus);
+		MorphToolRegistries.SERIALIZERS.register(bus);
 
 		modContainer.registerConfig(ModConfig.Type.COMMON, ConfigHandler.CONFIG_SPEC);
 
