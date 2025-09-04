@@ -76,7 +76,7 @@ public class ClientHandler {
 				if (event.getScrollDeltaY() != 0 && player.isCrouching() && !modlook.equals(mod)) {
 					if (mainHandItem.has(MorphToolRegistries.TOOL_CONTENT) && mainHandItem.get(MorphToolRegistries.TOOL_CONTENT) != null) {
 						ToolContentComponent contents = mainHandItem.get(MorphToolRegistries.TOOL_CONTENT);
-						mod = event.getScrollDeltaY() < 0 ? nextMod(contents, mod) : previousMod(contents, mod);
+						mod = nextMod(contents, mod);
 						newStack = MorphingHandler.getShiftStackForMod(mainHandItem, mod);
 						autoMode = mod.equals("morphtool");
 						event.setCanceled(true);

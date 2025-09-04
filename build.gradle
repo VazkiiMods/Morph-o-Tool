@@ -60,6 +60,14 @@ dependencies {
 
     implementation "curse.maven:mekanism-268560:6327955"
     implementation "curse.maven:immersive-engineering-231951:6418024"
+
+    //Oritech (I hate you, why so many dependencies)
+    implementation "curse.maven:architectury-api-419699:5786327"
+    implementation "curse.maven:athena-841890:5629395"
+    implementation "curse.maven:geckolib-388172:6304958"
+    implementation "curse.maven:forgified-fabric-api-889079:6370322"
+    implementation "curse.maven:owo-lib-532610:6416633"
+    implementation "curse.maven:oritech-1030830:6332316"
 }
 
 spotless {

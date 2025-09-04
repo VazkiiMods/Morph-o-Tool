@@ -81,9 +81,10 @@ public final class MorphingHandler {
 
 	public static String getModFromStack(ItemStack stack) {
 		String modId = stack.getItem().getCreatorModId(stack);
-		return getModOrAlias(stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT);
+		return /*getModOrAlias(*/stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT/*)*/;
 	}
 
+	//TODO figure out why this is used for items as well. Cuz now when switching to a tool that has an alias, the tool tries to find the registered item name under the alias modid
 	public static String getModOrAlias(String mod) {
 
 		Map<String, String> aliases = new HashMap<>();
@@ -104,6 +105,10 @@ public final class MorphingHandler {
 		}
 
 		if (stack.is(MorphToolRegistries.MORPH_TOOL) && Objects.equals(mod, MINECRAFT)) {
+			return stack;
+		}
+
+		if (getStackFromMod(stack.get(MorphToolRegistries.TOOL_CONTENT), mod).isEmpty() && mod != MINECRAFT) {
 			return stack;
 		}
 
@@ -128,7 +133,6 @@ public final class MorphingHandler {
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
 			stack = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
-			stack.getComponents().stream().forEach(c -> System.out.println(c.type() + ": " + c.value()));
 		} else {
 			stack = getStackFromMod(currentContent, targetMod);
 
