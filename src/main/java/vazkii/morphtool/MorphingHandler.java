@@ -81,7 +81,7 @@ public final class MorphingHandler {
 
 	public static String getModFromStack(ItemStack stack) {
 		String modId = stack.getItem().getCreatorModId(stack);
-		return /*getModOrAlias(*/stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT/*)*/;
+		return /*todo getModOrAlias(*/stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT/*)*/;
 	}
 
 	//TODO figure out why this is used for items as well. Cuz now when switching to a tool that has an alias, the tool tries to find the registered item name under the alias modid
@@ -99,29 +99,37 @@ public final class MorphingHandler {
 		return aliases.getOrDefault(mod, mod);
 	}
 
+    //TODO currently doesn't support multiple items of the same mod
 	public static ItemStack getShiftStackForMod(ItemStack stack, String mod) {
 		if (!stack.has(MorphToolRegistries.TOOL_CONTENT)) {
 			return stack;
 		}
 
+        var content = stack.get(MorphToolRegistries.TOOL_CONTENT);
+
 		if (stack.is(MorphToolRegistries.MORPH_TOOL) && Objects.equals(mod, MINECRAFT)) {
 			return stack;
 		}
 
-		if (getStackFromMod(stack.get(MorphToolRegistries.TOOL_CONTENT), mod).isEmpty() && mod != MINECRAFT) {
+        var stackOfMod = getStackFromMod(content, mod);
+
+		if (stackOfMod.isEmpty() && !Objects.equals(mod, MINECRAFT)) {
 			return stack;
 		}
 
 		String currentMod = getModFromStack(stack);
 		if (mod.equals(currentMod)) {
-			return stack;
+            if (ItemStack.isSameItemSameComponents(stack, stackOfMod)) {
+                return stack;
+            }
 		}
 
 		return makeMorphedStack(stack, mod, false);
 	}
 
 	public static ItemStack makeMorphedStack(ItemStack currentStack, String targetMod, boolean calledOnRemove) {
-		String currentMod = getModFromStack(currentStack);
+        currentStack = currentStack.copy();
+        String currentMod = getModFromStack(currentStack);
 		ToolContentComponent currentContent = currentStack.get(MorphToolRegistries.TOOL_CONTENT);
 		currentStack.remove(MorphToolRegistries.TOOL_CONTENT);
 		ToolContentComponent newStackComponent = new ToolContentComponent(List.of(currentStack));
@@ -180,7 +188,7 @@ public final class MorphingHandler {
 		if (component != null && !component.isEmpty()) {
 			for (ItemStack contentStack : component.getItems()) {
 				if (BuiltInRegistries.ITEM.getKey(contentStack.getItem()).getNamespace().equals(mod)) {
-					return contentStack;
+					return contentStack.copy();
 				}
 			}
 		}

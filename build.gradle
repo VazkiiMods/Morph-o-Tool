@@ -58,7 +58,7 @@ dependencies {
     implementation "curse.maven:common-capabilities-247007:6384335"
     implementation "curse.maven:integrated-dynamics-236307:6418767"
 
-    implementation "curse.maven:mekanism-268560:6327955"
+    implementation "curse.maven:mekanism-268560:7621971"
     implementation "curse.maven:immersive-engineering-231951:6418024"
 
     //Oritech (I hate you, why so many dependencies)
@@ -68,6 +68,8 @@ dependencies {
     implementation "curse.maven:forgified-fabric-api-889079:6370322"
     implementation "curse.maven:owo-lib-532610:6416633"
     implementation "curse.maven:oritech-1030830:6332316"
+
+    implementation "curse.maven:tool-belt-260262:7166902"
 }
 
 spotless {
