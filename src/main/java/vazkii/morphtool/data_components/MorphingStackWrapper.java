@@ -62,7 +62,7 @@ public class MorphingStackWrapper {
             return this;
         }
         newStack.remove(MorphToolRegistries.MORPH_DATA);
-        newStack.set(DataComponents.CUSTOM_NAME, this.ogDisplayName);
+        newStack.set(DataComponents.ITEM_NAME, this.ogDisplayName); //TODO check if this should be Item Name instead
         return new MorphingStackWrapper(newStack, this.modId, this.ogDisplayName);
     }
 

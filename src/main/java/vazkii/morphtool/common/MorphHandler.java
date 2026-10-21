@@ -6,6 +6,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,6 +19,7 @@ import vazkii.morphtool.data_components.MorphingDataComponent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public final class MorphHandler {
     public static final MorphHandler INSTANCE = new MorphHandler();
@@ -24,12 +27,41 @@ public final class MorphHandler {
 
     @SubscribeEvent
     public void onItemDropped(ItemTossEvent event) {
+        if (!event.getPlayer().isCrouching()) {
+            return;
+        }
 
+        ItemEntity itemEntity = event.getEntity();
+        ItemStack stack = itemEntity.getItem();
+        removeItemFromTool(itemEntity, stack, false, itemEntity::setItem);
     }
 
     @SubscribeEvent
     public void onItemBroken(PlayerDestroyItemEvent event) {
+        //TODO this currently doesn't work when using item in recipe
+        removeItemFromTool(event.getEntity(), event.getOriginal(), true, morph -> event.getEntity().setItemInHand(event.getHand(), morph)); //TODO hand check
+    }
 
+    public static void removeItemFromTool(Entity relevantEntity, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
+        if (stack != null && !stack.isEmpty() && isMorphedItem(stack) && !stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
+            var data = stack.get(MorphToolRegistries.MORPH_DATA);
+            if (data == null) return;
+            MorphingDataComponent.Mutable mutable = new MorphingDataComponent.Mutable(data);
+            var removedStack = mutable.removeCurrent();
+
+            var morphTool = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
+            morphTool.set(MorphToolRegistries.MORPH_DATA, mutable.toImmutable());
+
+            if (itemBroken) {
+                consumer.accept(morphTool);
+            } else {
+                if (!relevantEntity.getCommandSenderWorld().isClientSide()) {
+                    ItemEntity morphToolEntity = new ItemEntity(relevantEntity.getCommandSenderWorld(), relevantEntity.getX(), relevantEntity.getY(), relevantEntity.getZ(), morphTool);
+                    relevantEntity.getCommandSenderWorld().addFreshEntity(morphToolEntity);
+                }
+                consumer.accept(removedStack.copy());
+            }
+        }
     }
 
     public static ItemStack createStackOnScroll(MorphingDataComponent data, ItemStack currentStack, int nextIndex) {
@@ -42,13 +74,40 @@ public final class MorphHandler {
                 Component hoverName = nextStack.getHoverName();
                 Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
                 Component comp = Component.translatable("morphtool.sudo_name", stackName);
-                nextStack.set(DataComponents.CUSTOM_NAME, comp);
+                nextStack.set(DataComponents.ITEM_NAME, comp);
             }
 
             nextStack.setCount(1);
             return nextStack;
         }
         return ItemStack.EMPTY;
+    }
+
+    public static ItemStack createStackOnLookAt(ItemStack currentStack, String modLookedAt) {
+        if (modLookedAt.equals(MINECRAFT) && currentStack.is(MorphToolRegistries.MORPH_TOOL)) return currentStack;
+
+        var data = currentStack.get(MorphToolRegistries.MORPH_DATA);
+        if (data == null) return currentStack;
+
+        var mutable = new MorphingDataComponent.Mutable(data);
+
+        var nextStack = mutable.turnToFirstItemOfMod(currentStack, modLookedAt);
+
+        if (!nextStack.isEmpty()) {
+            nextStack.set(MorphToolRegistries.MORPH_DATA, mutable.toImmutable());
+
+            if (!nextStack.is(MorphToolRegistries.MORPH_TOOL.get())) {
+                Component hoverName = nextStack.getHoverName();
+                Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
+                Component comp = Component.translatable("morphtool.sudo_name", stackName);
+                nextStack.set(DataComponents.ITEM_NAME, comp);
+            }
+
+            nextStack.setCount(1);
+            return nextStack;
+        }
+
+        return currentStack;
     }
 
 
@@ -64,6 +123,13 @@ public final class MorphHandler {
             return true;
         }
 
+        return isMorphedItem(stack);
+    }
+
+    public static boolean isMorphedItem(ItemStack stack) {
+        if (stack.isEmpty()) {
+            return false;
+        }
         return stack.has(MorphToolRegistries.MORPH_DATA); //Only Morph Tool or Items inside the Morph Tool should have this data.
     }
 

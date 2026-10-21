@@ -28,7 +28,30 @@ public class MorphHandlerClient {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onTick(ClientTickEvent.Post event) {
+        Player player = Minecraft.getInstance().player;
+        if (player != null && autoMode) {
+            ItemStack mainHandItem = MorphHandler.getItemFromCorrectMainHand(player);
+            if (MorphHandler.isMorphToolOrMorphed(mainHandItem)) {
+                ItemStack newStack = mainHandItem;
+                HitResult res = MorphHandlerClient.raycast(player, 4.5);
 
+                //Get looked at Mod
+                //TODO check how to extract
+                if (res != null && res.getType() == HitResult.Type.BLOCK) {
+                    BlockState state = player.level().getBlockState(((BlockHitResult) res).getBlockPos());
+                    var modlook = MorphHandler.getModFromState(state);
+                    newStack = MorphHandler.createStackOnLookAt(mainHandItem, modlook);
+                }
+
+                //TODO also extract
+                if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
+                    var inventory = player.getInventory();
+                    inventory.setItem(MorphToolConfig.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
+                    NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
+                    updateEquippedItem();
+                }
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -53,11 +76,10 @@ public class MorphHandlerClient {
                     if (mainHandItem.has(MorphToolRegistries.MORPH_DATA)) {
                         var data = mainHandItem.get(MorphToolRegistries.MORPH_DATA);
                         if (data == null) return;
+                        if (data.isEmpty()) return;
                         int currentIndex = data.getCurrentItemIndex();
                         int nextIndex = getNextIndex(currentIndex, data.size(), event.getScrollDeltaY());
-                        if (nextIndex == -1) {
-                            autoMode = true;
-                        }
+                        autoMode = nextIndex == -1;
                         newStack = MorphHandler.createStackOnScroll(data, mainHandItem, nextIndex);
                         event.setCanceled(true);
                     }
@@ -71,8 +93,6 @@ public class MorphHandlerClient {
             }
         }
     }
-
-
 
     public static int getNextIndex(int currentIndex, int totalSize, double scrollDelta) {
         int newIndex = currentIndex;

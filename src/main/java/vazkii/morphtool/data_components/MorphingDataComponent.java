@@ -8,6 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.util.NeoForgeExtraCodecs;
+import vazkii.morphtool.common.MorphHandler;
 import vazkii.morphtool.common.MorphToolRegistries;
 
 import java.util.ArrayList;
@@ -167,6 +168,31 @@ public final class MorphingDataComponent {
             return stack;
         }
 
+        public ItemStack turnToFirstItemOfMod(ItemStack currentStack, String modId) {
+            if (this.morphingItemList.isEmpty() || (!this.availableModIds.contains(modId) && !modId.equals(MorphHandler.MINECRAFT))) return ItemStack.EMPTY;
+            if (currentStack.isEmpty()) return ItemStack.EMPTY;
+
+            if (this.currentItemIndex != -1) {
+                updateWrapperForCurrentIndex(currentStack);
+            }
+
+            ItemStack stack;
+
+            if (modId.equals(MorphHandler.MINECRAFT)) {
+                stack = new ItemStack(MorphToolRegistries.MORPH_TOOL.get());
+                setNotMorphed();
+                this.currentItemIndex = -1;
+            } else {
+                var nextWrapper = this.morphingItemList.stream().filter(wrapper -> wrapper.getModId().equals(modId)).toList().getFirst();
+                int newIndex = this.morphingItemList.indexOf(nextWrapper);
+                setMorphed();
+                this.currentItemIndex = newIndex;
+                stack = nextWrapper.getStack().copy();
+            }
+
+            return stack;
+        }
+
         /**
          * Retrieves the wrapper of the current index and updates the stack by providing the updated stack. <br>
          * This should be called when switching from one morphed item to another.
@@ -174,6 +200,30 @@ public final class MorphingDataComponent {
         private void updateWrapperForCurrentIndex(ItemStack updatedStack) {
             var currentWrapper = this.morphingItemList.get(this.currentItemIndex);
             this.morphingItemList.set(this.currentItemIndex, currentWrapper.updateStack(updatedStack.copy()));
+        }
+
+        public ItemStack removeCurrent() {
+            if (this.currentItemIndex == -1) return ItemStack.EMPTY; //Never execute for Morph Tool
+            var removedWrapper = this.morphingItemList.remove(this.currentItemIndex);
+            setNotMorphed();
+            this.currentItemIndex = -1;
+
+            var modIdOfRemoved = removedWrapper.getModId();
+            if (!hasWrapperForId(modIdOfRemoved)) {
+                this.availableModIds.remove(modIdOfRemoved);
+            }
+
+            return removedWrapper.getStack();
+        }
+
+        /**
+         * Checks if at least one of the currently stored wrappers has the given modId.
+         */
+        public boolean hasWrapperForId(String modId) {
+            for (var wrapper : this.morphingItemList) {
+                if (wrapper.getModId().equals(modId)) return true;
+            }
+            return false;
         }
 
         public MorphingDataComponent toImmutable() {
