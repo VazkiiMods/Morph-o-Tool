@@ -1,0 +1,6 @@
+- Reimplement destroy item logic
+- Reimplement drop item -> remove logic
+- Reimplement look at block to switch tool logic
+- Check how alias mechanic behaves, both directions?
+- Test on dedicated server
+- Test previously reported bugs again!!

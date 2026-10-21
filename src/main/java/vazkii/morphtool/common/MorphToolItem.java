@@ -1,4 +1,4 @@
-package vazkii.morphtool;
+package vazkii.morphtool.common;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
@@ -13,6 +13,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
+import vazkii.morphtool.MorphToolMod;
+import vazkii.morphtool.data_components.MorphingDataComponent;
+import vazkii.morphtool.data_components.MorphingStackWrapper;
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.List;
@@ -20,7 +23,7 @@ import java.util.List;
 public class MorphToolItem extends Item {
 
 	public MorphToolItem(Properties properties) {
-		super(properties.stacksTo(1).component(MorphToolRegistries.IS_MORPH_TOOL, false).component(MorphToolRegistries.TOOL_CONTENT, ToolContentComponent.EMPTY));
+		super(properties.stacksTo(1).component(MorphToolRegistries.MORPH_DATA, MorphingDataComponent.DEFAULT));
 	}
 
 	@Override
@@ -29,35 +32,27 @@ public class MorphToolItem extends Item {
 		BlockPos pos = context.getClickedPos();
 		BlockState block = context.getLevel().getBlockState(context.getClickedPos());
 		if (level.setBlock(pos, block.rotate(level, pos, Rotation.CLOCKWISE_90), Block.UPDATE_ALL)) {
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.sidedSuccess(level.isClientSide());
 		}
 		return super.useOn(context);
 	}
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag advanced) {
-		if (!stack.has(MorphToolRegistries.TOOL_CONTENT))
-			return;
+		if (!stack.has(MorphToolRegistries.MORPH_DATA)) return;
 
-		ToolContentComponent contents = stack.get(MorphToolRegistries.TOOL_CONTENT);
-		if (contents == null || contents.isEmpty())
+		MorphingDataComponent data = stack.get(MorphToolRegistries.MORPH_DATA);
+		if (data == null || data.isEmpty())
 			return;
 		if (Screen.hasShiftDown()) {
-			for (ItemStack contentStack : contents.getItems()) {
-				if (!contentStack.isEmpty()) {
-					Component name;
-					if (contentStack.has(MorphToolRegistries.OG_DISPLAY_NAME)) {
-						name = contentStack.get(MorphToolRegistries.OG_DISPLAY_NAME);
-					} else {
-						name = contentStack.getHoverName();
-					}
+			data.getMorphingWrappers().forEach(wrapper -> {
+				var mod = wrapper.getModId();
+				var name = wrapper.getOgDisplayName();
 
-					String mod = MorphingHandler.getModFromStack(contentStack);
-					tooltip.add(Component.literal(" " + mod + " : " + name.getString()));
-				}
-			}
+				tooltip.add(Component.literal(" " + mod + " : " + name.getString()));
+			});
 		} else {
-			tooltip.add(Component.translatable(MorphTool.MOD_ID + ".misc.shift_for_info"));
+			tooltip.add(Component.translatable(MorphToolMod.MOD_ID + ".misc.shift_for_info"));
 		}
 	}
 

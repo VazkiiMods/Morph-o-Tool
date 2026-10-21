@@ -1,4 +1,4 @@
-package vazkii.morphtool;
+package vazkii.morphtool.common;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -19,11 +19,13 @@ import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
 import net.neoforged.neoforgespi.language.IModInfo;
 
+import vazkii.morphtool.MorphToolConfig;
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.*;
 import java.util.function.Consumer;
 
+@Deprecated
 public final class MorphingHandler {
 	public static final MorphingHandler INSTANCE = new MorphingHandler();
 
@@ -67,6 +69,7 @@ public final class MorphingHandler {
 				copy.remove(MorphToolRegistries.IS_MORPH_TOOL);
 				copy.remove(DataComponents.CUSTOM_NAME);
 				copy.remove(MorphToolRegistries.OG_DISPLAY_NAME);
+				copy.remove(MorphToolRegistries.CONTENT_INDEX);
 
 				consumer.accept(copy);
 			} else {
@@ -81,15 +84,15 @@ public final class MorphingHandler {
 
 	public static String getModFromStack(ItemStack stack) {
 		String modId = stack.getItem().getCreatorModId(stack);
-		return /*todo getModOrAlias(*/stack.isEmpty() ? MINECRAFT : modId != null ? modId : MINECRAFT/*)*/;
+		return getModOrAlias(modId);
 	}
 
-	//TODO figure out why this is used for items as well. Cuz now when switching to a tool that has an alias, the tool tries to find the registered item name under the alias modid
+	//TODO figure out why this is used for items as well. Cuz now when switching to a tool that has an alias, the tool tries to find the registered item name under the alias modid (The problem is that getStackFromMod doesn't do the modOrAlias check)
 	public static String getModOrAlias(String mod) {
 
 		Map<String, String> aliases = new HashMap<>();
 
-		for (String s : ConfigHandler.aliasesList.get()) {
+		for (String s : MorphToolConfig.aliasesList.get()) {
 			if (s.matches(".+?=.+")) {
 				String[] tokens = s.toLowerCase().split("=");
 				aliases.put(tokens[0], tokens[1]);
@@ -132,11 +135,11 @@ public final class MorphingHandler {
         String currentMod = getModFromStack(currentStack);
 		ToolContentComponent currentContent = currentStack.get(MorphToolRegistries.TOOL_CONTENT);
 		currentStack.remove(MorphToolRegistries.TOOL_CONTENT);
-		ToolContentComponent newStackComponent = new ToolContentComponent(List.of(currentStack));
 		if (currentContent == null)
 			return ItemStack.EMPTY;
 
-		ToolContentComponent.Mutable mutable = getMutable(currentContent, newStackComponent, currentMod, calledOnRemove);
+		int indexOfCurrent = currentStack.getOrDefault(MorphToolRegistries.CONTENT_INDEX, -1);
+		ToolContentComponent.Mutable mutable = getMutable(currentContent, currentStack, indexOfCurrent, currentMod, calledOnRemove);
 
 		ItemStack stack;
 		if (targetMod.equals(MINECRAFT)) {
@@ -149,16 +152,18 @@ public final class MorphingHandler {
 			}
 		}
 
-		mutable.remove(stack);
-
-		stack.set(MorphToolRegistries.TOOL_CONTENT, mutable.toImmutable());
+		//mutable.remove(stack);
+		var immutableContent = mutable.toImmutable();
+		int currentIndex = immutableContent.getItems().indexOf(currentStack);
+		stack.set(MorphToolRegistries.TOOL_CONTENT, immutableContent);
 		stack.set(MorphToolRegistries.IS_MORPH_TOOL, true);
 
-		if (!stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
+		if (!stack.is(MorphToolRegistries.MORPH_TOOL.get())) { //TODO since all of these are for morphed items only, they should be unified
 			Component hoverName = getOrSetOGName(stack);
 			Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 			Component comp = Component.translatable("morphtool.sudo_name", stackName);
 			stack.set(DataComponents.CUSTOM_NAME, comp);
+			stack.set(MorphToolRegistries.CONTENT_INDEX, currentIndex);
 		}
 
 		stack.setCount(1);
@@ -176,10 +181,10 @@ public final class MorphingHandler {
 		return hoverName;
 	}
 
-	private static ToolContentComponent.Mutable getMutable(ToolContentComponent currentContent, ToolContentComponent newStackComponent, String currentMod, boolean calledOnRemove) {
+	private static ToolContentComponent.Mutable getMutable(ToolContentComponent currentContent, ItemStack newStack, int indexOfCurrent, String currentMod, boolean calledOnRemove) {
 		ToolContentComponent.Mutable currentContentMutable = new ToolContentComponent.Mutable(currentContent);
-		if (!currentMod.equalsIgnoreCase(MINECRAFT) && !currentMod.equalsIgnoreCase(MorphTool.MOD_ID) && !calledOnRemove) {
-			currentContentMutable.tryInsert(newStackComponent.getItems().getFirst());
+		if (!currentMod.equalsIgnoreCase(MINECRAFT) /*&& !currentMod.equalsIgnoreCase(MorphTool.MOD_ID)*/ && !calledOnRemove) {
+			currentContentMutable.tryInsertAndOverride(newStack, indexOfCurrent);
 		}
 		return currentContentMutable;
 	}
@@ -220,6 +225,7 @@ public final class MorphingHandler {
 		return stack.has(MorphToolRegistries.IS_MORPH_TOOL) && Boolean.TRUE.equals(stack.get(MorphToolRegistries.IS_MORPH_TOOL));
 	}
 
+	//TODO these two should be client only, right?
 	public static HitResult raycast(Entity e, double len) {
 		Vec3 vec = new Vec3(e.getX(), e.getY(), e.getZ());
 		if (e instanceof Player) {

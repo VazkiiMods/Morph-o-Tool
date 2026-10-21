@@ -9,12 +9,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import vazkii.morphtool.ConfigHandler;
-import vazkii.morphtool.MorphTool;
-import vazkii.morphtool.MorphingHandler;
+import vazkii.morphtool.MorphToolConfig;
+import vazkii.morphtool.MorphToolMod;
+import vazkii.morphtool.common.MorphHandler;
+import vazkii.morphtool.common.MorphingHandler;
 
 public record MessageMorphTool(ItemStack stack, int slot) implements CustomPacketPayload {
-	public static final Type<MessageMorphTool> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MorphTool.MOD_ID, "tool_data"));
+	public static final Type<MessageMorphTool> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MorphToolMod.MOD_ID, "tool_data"));
 	public static final StreamCodec<RegistryFriendlyByteBuf, MessageMorphTool> STREAM_CODEC = CustomPacketPayload.codec(
 			MessageMorphTool::serialize,
 			MessageMorphTool::new
@@ -37,10 +38,10 @@ public record MessageMorphTool(ItemStack stack, int slot) implements CustomPacke
 	public static void handle(MessageMorphTool msg, final IPayloadContext ctx) {
 		ctx.enqueueWork(() -> {
 			if (ctx.player() instanceof ServerPlayer player) {
-				ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
-				if (MorphingHandler.isMorphTool(mainHandItem) && msg.stack() != mainHandItem && !ItemStack.isSameItem(msg.stack(), mainHandItem)) {
+				ItemStack mainHandItem = MorphHandler.getItemFromCorrectMainHand(player);
+				if (MorphHandler.isMorphToolOrMorphed(mainHandItem) && msg.stack() != mainHandItem && !ItemStack.isSameItem(msg.stack(), mainHandItem)) {
 					var inventory = player.getInventory();
-					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : msg.slot(), msg.stack());
+					inventory.setItem(MorphToolConfig.invertHandShift.get() ? inventory.getContainerSize() - 1 : msg.slot(), msg.stack());
 				}
 			}
 		});

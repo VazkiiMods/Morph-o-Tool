@@ -1,4 +1,4 @@
-package vazkii.morphtool;
+package vazkii.morphtool.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -7,13 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 
+import vazkii.morphtool.MorphToolConfig;
+import vazkii.morphtool.common.MorphToolRegistries;
+import vazkii.morphtool.common.MorphingHandler;
 import vazkii.morphtool.data_components.ToolContentComponent;
 import vazkii.morphtool.network.MessageMorphTool;
 import vazkii.morphtool.network.NetworkHandler;
@@ -21,9 +22,8 @@ import vazkii.morphtool.network.NetworkHandler;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
-@OnlyIn(Dist.CLIENT)
+@Deprecated //TODO redo
 public class ClientHandler {
 	public static final ClientHandler INSTANCE = new ClientHandler();
 	protected static boolean autoMode = true;
@@ -32,7 +32,7 @@ public class ClientHandler {
 	public void onTick(ClientTickEvent.Post event) {
 		Player player = Minecraft.getInstance().player;
 		if (player != null && autoMode) {
-			ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+			ItemStack mainHandItem = player.getItemInHand(MorphToolConfig.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 			if (MorphingHandler.isMorphTool(mainHandItem)) {
 				ItemStack newStack = mainHandItem;
 				HitResult res = MorphingHandler.raycast(player, 4.5);
@@ -47,9 +47,9 @@ public class ClientHandler {
 
 				if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
-					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
+					inventory.setItem(MorphToolConfig.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
 					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
-					MorphTool.proxy.updateEquippedItem();
+					updateEquippedItem();
 				}
 			}
 		}
@@ -59,7 +59,7 @@ public class ClientHandler {
 	public void onMouseEvent(InputEvent.MouseScrollingEvent event) {
 		Player player = Minecraft.getInstance().player;
 		if (player != null) {
-			ItemStack mainHandItem = player.getItemInHand(ConfigHandler.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+			ItemStack mainHandItem = player.getItemInHand(MorphToolConfig.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
 			if (MorphingHandler.isMorphTool(mainHandItem)) {
 				ItemStack newStack = mainHandItem;
 				String mod = MorphingHandler.getModFromStack(mainHandItem);
@@ -73,9 +73,15 @@ public class ClientHandler {
 				}
 
 				//Manual Scroll for Morph (excluding looked at a mod block incase it also needs scrolling)
+				System.out.println(event.getScrollDeltaY());
 				if (event.getScrollDeltaY() != 0 && player.isCrouching() && !modlook.equals(mod)) {
 					if (mainHandItem.has(MorphToolRegistries.TOOL_CONTENT) && mainHandItem.get(MorphToolRegistries.TOOL_CONTENT) != null) {
 						ToolContentComponent contents = mainHandItem.get(MorphToolRegistries.TOOL_CONTENT);
+						if (contents != null) {
+							var allItems = contents.getItems();
+							int currentIndex = allItems.indexOf(mainHandItem);
+							int nextIndex = getNextIndex(allItems, currentIndex, event.getScrollDeltaY() > 0);
+						}
 						mod = nextMod(contents, mod);
 						newStack = MorphingHandler.getShiftStackForMod(mainHandItem, mod);
 						autoMode = mod.equals("morphtool");
@@ -84,12 +90,33 @@ public class ClientHandler {
 				}
 				if (newStack != mainHandItem && !ItemStack.isSameItemSameComponents(newStack, mainHandItem)) {
 					var inventory = player.getInventory();
-					inventory.setItem(ConfigHandler.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
+					inventory.setItem(MorphToolConfig.invertHandShift.get() ? inventory.getContainerSize() - 1 : inventory.selected, newStack);
 					NetworkHandler.sendToServer(new MessageMorphTool(newStack, inventory.selected));
-					MorphTool.proxy.updateEquippedItem();
+					updateEquippedItem();
 				}
 			}
 		}
+	}
+
+	public void updateEquippedItem() {
+		Minecraft.getInstance().gameRenderer.itemInHandRenderer.itemUsed(MorphToolConfig.invertHandShift.get() ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND);
+	}
+
+	public static int getNextIndex(List<ItemStack> items, int currentIndex, boolean scrollUp) {
+		int size = items.size();
+		int newIndex = currentIndex;
+		if (scrollUp) {
+			newIndex++;
+			if (newIndex > size) {
+				newIndex = 0;
+			}
+		} else {
+			newIndex--;
+			if (newIndex < 0) {
+				newIndex = size;
+			}
+		}
+		return newIndex;
 	}
 
 	public static List<String> getModsFromStacks(ToolContentComponent toolContents) {
@@ -102,11 +129,9 @@ public class ClientHandler {
 
 	public static String nextMod(ToolContentComponent toolContents, String mod) {
 		List<String> mods = getModsFromStacks(toolContents);
+		System.out.println(mods);
 		mods.add("morphtool");
-		if (!mod.equals("morphtool")) {
-			mods.add(mod);
-		}
-		Collections.sort(mods);
+		//Collections.sort(mods);
 		int id = mods.indexOf(mod);
 		int retid = 0;
 		//Move up the Array

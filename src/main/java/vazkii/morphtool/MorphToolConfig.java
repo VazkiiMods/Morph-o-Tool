@@ -9,22 +9,22 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 
-public class ConfigHandler {
+public class MorphToolConfig {
 
 	public static ModConfigSpec.BooleanValue allItems;
 	public static ModConfigSpec.BooleanValue invertHandShift;
 	public static ModConfigSpec.ConfigValue<List<? extends String>> whitelistedItems, whitelistedNames, blacklistedMods;
 	public static ModConfigSpec.ConfigValue<List<? extends String>> aliasesList;
-	static final ConfigHandler CONFIG;
+	static final MorphToolConfig CONFIG;
 	static final ModConfigSpec CONFIG_SPEC;
 
 	static {
-		final Pair<ConfigHandler, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(ConfigHandler::new);
+		final Pair<MorphToolConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(MorphToolConfig::new);
 		CONFIG = specPair.getLeft();
 		CONFIG_SPEC = specPair.getRight();
 	}
 
-	public ConfigHandler(ModConfigSpec.Builder builder) {
+	public MorphToolConfig(ModConfigSpec.Builder builder) {
 		allItems = builder.define("allow_all_items", false); //Allow all items to be added
 		invertHandShift = builder.define("offhand_morph", false); //Morph in the offhand instead of mainhand
 

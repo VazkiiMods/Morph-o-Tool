@@ -1,4 +1,4 @@
-package vazkii.morphtool;
+package vazkii.morphtool.common;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -12,6 +12,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
+import vazkii.morphtool.MorphToolConfig;
+import vazkii.morphtool.data_components.MorphingDataComponent;
 import vazkii.morphtool.data_components.ToolContentComponent;
 
 public class AttachementRecipe extends CustomRecipe {
@@ -61,6 +63,7 @@ public class AttachementRecipe extends CustomRecipe {
 		for (int i = 0; i < input.size(); i++) {
 			ItemStack stack = input.getItem(i);
 			if (!stack.isEmpty()) {
+				//Always check for the item here and not for the component! (We don't want a morphed item to be used in the recipe)
 				if (stack.is(MorphToolRegistries.MORPH_TOOL.get())) {
 					tool = stack;
 				} else {
@@ -69,19 +72,19 @@ public class AttachementRecipe extends CustomRecipe {
 			}
 		}
 
-		if (!tool.has(MorphToolRegistries.TOOL_CONTENT))
-			return ItemStack.EMPTY;
+		if (!tool.has(MorphToolRegistries.MORPH_DATA)) return ItemStack.EMPTY;
+
 		ItemStack copy = tool.copy();
-		ToolContentComponent contents = copy.get(MorphToolRegistries.TOOL_CONTENT);
-		if (contents == null) {
+		MorphingDataComponent data = copy.get(MorphToolRegistries.MORPH_DATA);
+		if (data == null) { //Should never be the case because of previous check
 			return ItemStack.EMPTY;
 		}
 
-		ToolContentComponent.Mutable mutable = new ToolContentComponent.Mutable(contents);
-		if (!target.isEmpty()) {
-			mutable.tryInsert(target);
+		MorphingDataComponent.Mutable mutable = new MorphingDataComponent.Mutable(data);
+		if (target.isEmpty() || !mutable.tryAddNewItem(target)) {
+			return ItemStack.EMPTY;
 		}
-		copy.set(MorphToolRegistries.TOOL_CONTENT, mutable.toImmutable());
+		copy.set(MorphToolRegistries.MORPH_DATA, mutable.toImmutable());
 
 		return copy;
 	}
@@ -92,31 +95,31 @@ public class AttachementRecipe extends CustomRecipe {
 	}
 
 	public boolean isTarget(ItemStack stack) {
-		if (stack.isEmpty() || MorphingHandler.isMorphTool(stack)) {
+		if (stack.isEmpty() || MorphHandler.isMorphToolOrMorphed(stack)) {
 			return false;
 		}
 
-		String mod = MorphingHandler.getModFromStack(stack);
-		if (mod.equals(MorphingHandler.MINECRAFT)) {
+		String mod = MorphHandler.getDirectModFromStack(stack);
+		if (mod.equals(MorphHandler.MINECRAFT)) { //Not allowed because looking at vanilla blocks should turn Tool back to normal
 			return false;
 		}
 
-		if (ConfigHandler.allItems.get()) {
+		if (MorphToolConfig.allItems.get()) {
 			return true;
 		}
 
-		if (ConfigHandler.blacklistedMods.get().contains(mod)) {
+		if (MorphToolConfig.blacklistedMods.get().contains(mod)) {
 			return false;
 		}
 
 		ResourceLocation registryNameRL = BuiltInRegistries.ITEM.getKey(stack.getItem());
 		String registryName = registryNameRL.toString();
-		if (ConfigHandler.whitelistedItems.get().contains(registryName) || ConfigHandler.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue())) {
+		if (MorphToolConfig.whitelistedItems.get().contains(registryName) || MorphToolConfig.whitelistedItems.get().contains(registryName + ":" + stack.getDamageValue())) {
 			return true;
 		}
 
 		String itemName = registryNameRL.getPath().toLowerCase();
-		for (String s : ConfigHandler.whitelistedNames.get()) {
+		for (String s : MorphToolConfig.whitelistedNames.get()) {
 			if (itemName.contains(s.toLowerCase())) {
 				return true;
 			}

@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
 public class ToolContentComponent {
 	public static final ToolContentComponent EMPTY = new ToolContentComponent(List.of());
 	public static final Codec<ToolContentComponent> CODEC = ItemStack.CODEC
@@ -68,6 +69,16 @@ public class ToolContentComponent {
 				ItemStack itemstack1 = stack.copy();
 				this.items.add(itemstack1);
 			}
+		}
+
+		public void tryInsertAndOverride(ItemStack stack, int index) { //todo rename to tryOverrideOrInsert
+			if (stack.isEmpty()) return;
+			if (index < 0) {
+				tryInsert(stack);
+				return;
+			}
+			ItemStack itemstack1 = stack.copy();
+			this.items.set(index, itemstack1);
 		}
 
 		public void remove(ItemStack stack) {
