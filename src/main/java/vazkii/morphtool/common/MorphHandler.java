@@ -38,8 +38,7 @@ public final class MorphHandler {
 
     @SubscribeEvent
     public void onItemBroken(PlayerDestroyItemEvent event) {
-        //TODO this currently doesn't work when using item in recipe
-        removeItemFromTool(event.getEntity(), event.getOriginal(), true, morph -> event.getEntity().setItemInHand(event.getHand(), morph)); //TODO hand check
+        removeItemFromTool(event.getEntity(), event.getOriginal(), true, morph -> event.getEntity().setItemInHand(event.getHand(), morph));
     }
 
     public static void removeItemFromTool(Entity relevantEntity, ItemStack stack, boolean itemBroken, Consumer<ItemStack> consumer) {
@@ -110,7 +109,6 @@ public final class MorphHandler {
         return currentStack;
     }
 
-
     /**
      * Checks if the given item is an untransformed Morph Tool or an item that the Morph Tool has turned into.
      */
@@ -142,23 +140,11 @@ public final class MorphHandler {
         return getModOrAlias(modOfBlock);
     }
 
-    //TODO Previously used alias too, idk if that's necessary
     public static String getDirectModFromStack(ItemStack stack) {
         return stack.getItem().getCreatorModId(stack);
     }
 
-    public static String getModOrAliasFromStack(ItemStack stack) {
-        String modId = stack.getItem().getCreatorModId(stack);
-        return getModOrAlias(modId);
-    }
-
-    /** TODO rethink this <br>
-     * A block from source mod should be compatible with item from source and alias
-     * A block from alias should be compatible with item from alias and source
-     * <br>
-     * Is this the case rn??
-     *
-     */
+    //Maps modId to alias modId. Will change in the future
     public static String getModOrAlias(String mod) {
         Map<String, String> aliases = new HashMap<>();
 

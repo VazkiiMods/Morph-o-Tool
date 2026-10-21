@@ -30,13 +30,15 @@ public class MorphToolConfig {
 
 		whitelistedItems = builder.defineList("whitelist_items", //"Whitelisted Items"
 				Lists.newArrayList("botania:twig_wand",
-						"appliedenergistics2:network_tool",
+						"ae2:network_tool",
 						"immersiveengineering:tool",
 						"buildersguides:mallet",
 						"environmentaltech:tool_multiblock_assembler",
 						"bloodmagic:ritual_reader",
 						"draconicevolution:crystal_binder",
-						"crossroads:omnimeter"),
+						"crossroads:omnimeter",
+						"storagedrawers:keyring"
+				),
 				String::new,
 				Predicates.alwaysTrue());
 
@@ -46,7 +48,8 @@ public class MorphToolConfig {
 						"hammer",
 						"rotator",
 						"configurator",
-						"crowbar"),
+						"crowbar"
+				),
 				String::new,
 				Predicates.alwaysTrue());
 
@@ -65,7 +68,6 @@ public class MorphToolConfig {
 						"rftoolsdim=rftools",
 						"rftoolspower=rftools",
 						"rftoolscontrol=rftools",
-						"ae2stuff=appliedenergistics2",
 						"animus=bloodmagic",
 						"integrateddynamics=integratedtunnels",
 						"mekanismgenerators=mekanism",

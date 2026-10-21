@@ -50,7 +50,7 @@ dependencies {
 
     //test mods
     implementation "curse.maven:applied-energistics-2-223794:5610903"
-    implementation "curse.maven:storage-drawers-223852:5840297"
+    implementation "curse.maven:storage-drawers-223852:6995432"
     implementation "curse.maven:just-dire-things-1002348:6369120"
 
     //Integrated dynamics
@@ -58,7 +58,8 @@ dependencies {
     implementation "curse.maven:common-capabilities-247007:6384335"
     implementation "curse.maven:integrated-dynamics-236307:6418767"
 
-    implementation "curse.maven:mekanism-268560:7621971"
+    implementation "curse.maven:mekanism-268560:7904058"
+    implementation "curse.maven:mekanism-generators-268566:7904061"
     implementation "curse.maven:immersive-engineering-231951:6418024"
 
     //Oritech (I hate you, why so many dependencies)
