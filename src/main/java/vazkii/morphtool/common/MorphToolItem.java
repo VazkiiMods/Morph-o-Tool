@@ -15,8 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import vazkii.morphtool.MorphToolMod;
 import vazkii.morphtool.data_components.MorphingDataComponent;
-import vazkii.morphtool.data_components.MorphingStackWrapper;
-import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.List;
 
@@ -39,7 +37,8 @@ public class MorphToolItem extends Item {
 
 	@Override
 	public void appendHoverText(ItemStack stack, Item.TooltipContext tooltipContext, List<Component> tooltip, TooltipFlag advanced) {
-		if (!stack.has(MorphToolRegistries.MORPH_DATA)) return;
+		if (!stack.has(MorphToolRegistries.MORPH_DATA))
+			return;
 
 		MorphingDataComponent data = stack.get(MorphToolRegistries.MORPH_DATA);
 		if (data == null || data.isEmpty())

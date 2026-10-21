@@ -13,7 +13,6 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import vazkii.morphtool.MorphToolMod;
 import vazkii.morphtool.common.MorphHandler;
 import vazkii.morphtool.common.MorphToolRegistries;
-import vazkii.morphtool.common.MorphingHandler;
 
 @Mod(value = MorphToolMod.MOD_ID, dist = Dist.CLIENT)
 public class MorphToolModClient {
@@ -21,7 +20,7 @@ public class MorphToolModClient {
 	public MorphToolModClient(IEventBus bus, ModContainer modContainer) {
 		bus.addListener(this::addToCreativeTab);
 
-		NeoForge.EVENT_BUS.register(MorphHandler.INSTANCE); //TODO check if this really needs to be called here?
+		NeoForge.EVENT_BUS.register(MorphHandler.INSTANCE);
 		NeoForge.EVENT_BUS.register(MorphHandlerClient.INSTANCE);
 
 		modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);

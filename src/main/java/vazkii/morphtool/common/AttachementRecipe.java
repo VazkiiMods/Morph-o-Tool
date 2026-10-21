@@ -12,9 +12,9 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
+
 import vazkii.morphtool.MorphToolConfig;
 import vazkii.morphtool.data_components.MorphingDataComponent;
-import vazkii.morphtool.data_components.ToolContentComponent;
 
 public class AttachementRecipe extends CustomRecipe {
 
@@ -72,7 +72,8 @@ public class AttachementRecipe extends CustomRecipe {
 			}
 		}
 
-		if (!tool.has(MorphToolRegistries.MORPH_DATA)) return ItemStack.EMPTY;
+		if (!tool.has(MorphToolRegistries.MORPH_DATA))
+			return ItemStack.EMPTY;
 
 		ItemStack copy = tool.copy();
 		MorphingDataComponent data = copy.get(MorphToolRegistries.MORPH_DATA);

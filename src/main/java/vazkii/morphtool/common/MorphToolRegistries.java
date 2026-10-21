@@ -1,13 +1,8 @@
 package vazkii.morphtool.common;
 
-import com.mojang.serialization.Codec;
-
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
@@ -16,27 +11,17 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import vazkii.morphtool.MorphToolMod;
 import vazkii.morphtool.data_components.MorphingDataComponent;
-import vazkii.morphtool.data_components.ToolContentComponent;
 
 import java.util.function.Supplier;
 
 public final class MorphToolRegistries {
 	public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(MorphToolMod.MOD_ID);
-	public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, MorphToolMod.MOD_ID);
-	public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MorphToolMod.MOD_ID);
-
-
-	//New
-	public static final Supplier<DataComponentType<MorphingDataComponent>> MORPH_DATA = DATA_COMPONENTS.registerComponentType("morph_data", builder -> builder.persistent(MorphingDataComponent.CODEC).networkSynchronized(MorphingDataComponent.STREAM_CODEC).cacheEncoding());
-
-
-	public static final Supplier<DataComponentType<Boolean>> IS_MORPH_TOOL = DATA_COMPONENTS.registerComponentType("is_morph_tool", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-	public static final Supplier<DataComponentType<ToolContentComponent>> TOOL_CONTENT = DATA_COMPONENTS.registerComponentType("tool_content", builder -> builder.persistent(ToolContentComponent.CODEC).networkSynchronized(ToolContentComponent.STREAM_CODEC).cacheEncoding());
-	public static final Supplier<DataComponentType<Component>> OG_DISPLAY_NAME = DATA_COMPONENTS.register("og_display_name", () -> DataComponentType.<Component>builder().persistent(ComponentSerialization.FLAT_CODEC).networkSynchronized(ComponentSerialization.STREAM_CODEC).build());
-	public static final Supplier<DataComponentType<Integer>> CONTENT_INDEX = DATA_COMPONENTS.register("morph_content_index", () -> DataComponentType.<Integer>builder().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT).build());
-
 	public static final DeferredItem<Item> MORPH_TOOL = ITEMS.registerItem("tool", MorphToolItem::new, new Item.Properties().stacksTo(1));
 
-	public static final Supplier<RecipeSerializer<AttachementRecipe>> ATTACHMENT = SERIALIZERS.register("attachment", () -> new SimpleCraftingRecipeSerializer<>(AttachementRecipe::new));
+	public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, MorphToolMod.MOD_ID);
+	public static final Supplier<DataComponentType<MorphingDataComponent>> MORPH_DATA = DATA_COMPONENTS.registerComponentType("morph_data", builder -> builder.persistent(MorphingDataComponent.CODEC).networkSynchronized(MorphingDataComponent.STREAM_CODEC).cacheEncoding());
+
+	public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, MorphToolMod.MOD_ID);
+	public static final Supplier<RecipeSerializer<AttachementRecipe>> ATTACHMENT = RECIPE_SERIALIZERS.register("attachment", () -> new SimpleCraftingRecipeSerializer<>(AttachementRecipe::new));
 
 }

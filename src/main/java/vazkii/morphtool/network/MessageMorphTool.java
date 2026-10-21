@@ -5,14 +5,12 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import vazkii.morphtool.MorphToolConfig;
 import vazkii.morphtool.MorphToolMod;
 import vazkii.morphtool.common.MorphHandler;
-import vazkii.morphtool.common.MorphingHandler;
 
 public record MessageMorphTool(ItemStack stack, int slot) implements CustomPacketPayload {
 	public static final Type<MessageMorphTool> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(MorphToolMod.MOD_ID, "tool_data"));

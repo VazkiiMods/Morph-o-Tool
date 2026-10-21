@@ -1,5 +1,4 @@
-- Test on dedicated server
-- Test previously reported bugs again!!
+
 - Reorganize
 - Renaming Morphtool or items inside morphtool (before they were included) should be supported
 
