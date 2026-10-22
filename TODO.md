@@ -1,5 +1,3 @@
-
-- Reorganize
 - Renaming Morphtool or items inside morphtool (before they were included) should be supported
 
 ### Aliases
