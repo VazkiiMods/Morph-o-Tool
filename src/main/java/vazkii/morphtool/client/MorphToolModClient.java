@@ -20,10 +20,10 @@ public class MorphToolModClient {
 	public MorphToolModClient(IEventBus bus, ModContainer modContainer) {
 		bus.addListener(this::addToCreativeTab);
 
+		modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+
 		NeoForge.EVENT_BUS.register(MorphHandler.INSTANCE);
 		NeoForge.EVENT_BUS.register(MorphHandlerClient.INSTANCE);
-
-		modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 	}
 
 	private void addToCreativeTab(BuildCreativeModeTabContentsEvent event) {

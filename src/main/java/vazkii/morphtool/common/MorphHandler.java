@@ -68,19 +68,8 @@ public final class MorphHandler {
 	public static ItemStack createStackOnScroll(MorphingDataComponent data, ItemStack currentStack, int nextIndex) {
 		var mutable = new MorphingDataComponent.Mutable(data);
 		var nextStack = mutable.turnToNextItem(currentStack, nextIndex);
-		if (!nextStack.isEmpty()) {
-			nextStack.set(MorphToolRegistries.MORPH_DATA, mutable.toImmutable());
-
-			if (!nextStack.is(MorphToolRegistries.MORPH_TOOL.get())) {
-				Component hoverName = nextStack.getHoverName();
-				Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
-				Component comp = Component.translatable("morphtool.sudo_name", stackName);
-				nextStack.set(DataComponents.ITEM_NAME, comp);
-			}
-
-			nextStack.setCount(1);
+		if (finalizeItemMorph(mutable, nextStack))
 			return nextStack;
-		}
 		return ItemStack.EMPTY;
 	}
 
@@ -96,6 +85,20 @@ public final class MorphHandler {
 
 		var nextStack = mutable.turnToFirstItemOfMod(currentStack, modLookedAt);
 
+		if (finalizeItemMorph(mutable, nextStack))
+			return nextStack;
+
+		return currentStack;
+	}
+
+	/**
+	 * Validates the item, sets the remaining data to the new item, calculates the new name and sets the count.
+	 *
+	 * @param mutable   the remaining morph data
+	 * @param nextStack the item the morph tool turn into
+	 * @return true if finalization completed successfully
+	 */
+	private static boolean finalizeItemMorph(MorphingDataComponent.Mutable mutable, ItemStack nextStack) {
 		if (!nextStack.isEmpty()) {
 			nextStack.set(MorphToolRegistries.MORPH_DATA, mutable.toImmutable());
 
@@ -107,10 +110,9 @@ public final class MorphHandler {
 			}
 
 			nextStack.setCount(1);
-			return nextStack;
+			return true;
 		}
-
-		return currentStack;
+		return false;
 	}
 
 	/**
