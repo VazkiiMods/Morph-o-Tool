@@ -1,5 +1,4 @@
 plugins {
-    id 'eclipse'
     id 'maven-publish'
     id 'pmd'
     id 'com.diffplug.spotless' version '6.25.0'

@@ -1,1 +1,7 @@
+- Fixed kicking player from server when using Morph Tool
+- Fixed item duplication bug
+- Fixed loosing or softlocking items in the tool
+- Fixed various scrolling issues
+- Fixed various crashes
+- Added `storagedrawers:keyring` as whitelisted item
 - Add zh_tw translation @EvanHsieh0415
