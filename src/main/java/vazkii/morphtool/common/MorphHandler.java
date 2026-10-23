@@ -106,7 +106,7 @@ public final class MorphHandler {
 				Component hoverName = nextStack.getHoverName();
 				Component stackName = Component.literal(hoverName.getString()).setStyle(Style.EMPTY.applyFormats(ChatFormatting.GREEN));
 				Component comp = Component.translatable("morphtool.sudo_name", stackName);
-				nextStack.set(DataComponents.ITEM_NAME, comp);
+				nextStack.set(DataComponents.CUSTOM_NAME, comp);
 			}
 
 			nextStack.setCount(1);

@@ -3,6 +3,7 @@ package vazkii.morphtool.data_components;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -87,7 +88,7 @@ public final class MorphingDataComponent {
 	public int hashCode() {
 		int i = 0;
 		for (MorphingStackWrapper wrapper : this.getMorphingWrappers()) {
-			i = i * 31 + ItemStack.hashItemAndComponents(wrapper.getStack());
+			i = i * 31 + ItemStack.hashItemAndComponents(wrapper.stack());
 		}
 		return i;
 	}
@@ -136,7 +137,7 @@ public final class MorphingDataComponent {
 			var stackCopy = stack.copy();
 			var modId = BuiltInRegistries.ITEM.getKey(stackCopy.getItem()).getNamespace();
 			var currentName = stack.getHoverName();
-			var stackWrapper = new MorphingStackWrapper(stackCopy, modId, currentName);
+			var stackWrapper = new MorphingStackWrapper(stackCopy, modId, currentName, stack.has(DataComponents.CUSTOM_NAME));
 			this.morphingItemList.add(stackWrapper);
 			this.addModId(modId);
 			return true;
@@ -165,7 +166,7 @@ public final class MorphingDataComponent {
 			} else {
 				// Calculate next wrapper, set morphed and change index
 				var nextWrapper = this.morphingItemList.get(nextIndex);
-				stack = nextWrapper.getStack().copy();
+				stack = nextWrapper.stack().copy();
 				setMorphed();
 			}
 
@@ -192,11 +193,11 @@ public final class MorphingDataComponent {
 				setNotMorphed();
 				this.currentItemIndex = -1;
 			} else {
-				var nextWrapper = this.morphingItemList.stream().filter(wrapper -> wrapper.getModId().equals(modId)).toList().getFirst();
+				var nextWrapper = this.morphingItemList.stream().filter(wrapper -> wrapper.modId().equals(modId)).toList().getFirst();
 				int newIndex = this.morphingItemList.indexOf(nextWrapper);
 				setMorphed();
 				this.currentItemIndex = newIndex;
-				stack = nextWrapper.getStack().copy();
+				stack = nextWrapper.stack().copy();
 			}
 
 			return stack;
@@ -218,12 +219,12 @@ public final class MorphingDataComponent {
 			setNotMorphed();
 			this.currentItemIndex = -1;
 
-			var modIdOfRemoved = removedWrapper.getModId();
+			var modIdOfRemoved = removedWrapper.modId();
 			if (!hasWrapperForId(modIdOfRemoved)) {
 				this.availableModIds.remove(modIdOfRemoved);
 			}
 
-			return removedWrapper.getStack();
+			return removedWrapper.stack();
 		}
 
 		/**
@@ -231,7 +232,7 @@ public final class MorphingDataComponent {
 		 */
 		public boolean hasWrapperForId(String modId) {
 			for (var wrapper : this.morphingItemList) {
-				if (wrapper.getModId().equals(modId))
+				if (wrapper.modId().equals(modId))
 					return true;
 			}
 			return false;

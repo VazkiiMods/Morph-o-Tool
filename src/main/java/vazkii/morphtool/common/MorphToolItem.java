@@ -45,8 +45,8 @@ public class MorphToolItem extends Item {
 			return;
 		if (Screen.hasShiftDown()) {
 			data.getMorphingWrappers().forEach(wrapper -> {
-				var mod = wrapper.getModId();
-				var name = wrapper.getOgDisplayName();
+				var mod = wrapper.modId();
+				var name = wrapper.ogDisplayName();
 
 				tooltip.add(Component.literal(" " + mod + " : " + name.getString()));
 			});
